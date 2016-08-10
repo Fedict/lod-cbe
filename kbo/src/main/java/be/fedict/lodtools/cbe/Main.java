@@ -25,21 +25,20 @@
  */
 package be.fedict.lodtools.cbe;
 
-import be.fedict.lodtools.util.CsvBulkReader;
-import be.fedict.lodtools.vocab.ORG;
-import be.fedict.lodtools.vocab.ROV;
 import java.io.BufferedWriter;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.FileWriter;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
@@ -48,13 +47,15 @@ import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.FOAF;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.SKOS;
+
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
 
 /**
- *
+ * Convert open data CBE to RDF Triples.
+ * 
  * @author Bart Hanssens <bart.hanssens@fedict.be>
  */
 public class Main {
