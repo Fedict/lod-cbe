@@ -7,8 +7,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>kbo</module>
-        <module>vocab</module>
-        <module>util</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
