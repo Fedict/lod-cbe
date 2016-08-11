@@ -83,11 +83,11 @@ public class Main {
     /**
 	 * Make unique ID for an organization or site
 	 * 
-	 * @param cbe CBE number as string
 	 * @param type organization or site
+	 * @param cbe CBE number as string
 	 * @return IRI
 	 */
-    private static IRI makeID(String cbe, String type) {
+    private static IRI makeID(String type, String cbe) {
         return F.createIRI(new StringBuilder(domain)
                             .append(type)
                             .append(cbe.replaceAll("\\.", "_"))
@@ -186,7 +186,7 @@ public class Main {
      * Generate stream of organization name triples
      */
     private final static Function<String[],Stream<Statement>> Names = row -> {
-        IRI subj = makeID(row[0], row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE);
+        IRI subj = makeID(row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE, row[0]);
         String lang = "";
         switch(row[1]) {
             case "1": lang = "fr"; break;
@@ -198,9 +198,6 @@ public class Main {
 		
 		Stream.Builder<Statement> s = Stream.builder();
         s.add(F.createStatement(subj, pred, F.createLiteral(row[3], lang)));
-		if (row[0].startsWith("0")) {
-			s.add(F.createStatement(subj, OWL.SAMEAS, makeOCID(row[0])));
-		}
         return s.build();
     };
     
@@ -215,6 +212,7 @@ public class Main {
         Stream.Builder<Statement> s = Stream.builder();
         s.add(F.createStatement(subj, RDF.TYPE, ROV.REGISTERED_ORGANIZATION))
             .add(F.createStatement(subj, ROV.REGISTRATION, reg))
+			.add(F.createStatement(subj, OWL.SAMEAS, makeOCID(row[0])))
             .add(F.createStatement(reg, DCTERMS.ISSUED, F.createLiteral(date)));
         return s.build();
     };

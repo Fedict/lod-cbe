@@ -5,7 +5,7 @@ Java 8 command line tool to convert CSV dump of the KBO/BCE (the official compan
 The ZIP with the CSV files can be obtained from the [KBO open data registration page](https://kbopub.economie.fgov.be/kbo-open-data/?lang=en)
 
 The result is a fairly large RDF (N-Triples) file: currently the conversion produces a 4 GB file, containing about 30 million triples.
-Compression this file with ZIP or HDT reduces the file size to 200-250 MB.
+Compressing this file with ZIP, or using RDF HDT, reduces the file size to 200-250 MB.
 
 ## RDF Vocabularies
 
@@ -14,4 +14,4 @@ Compression this file with ZIP or HDT reduces the file size to 200-250 MB.
 
 ## Libraries
 
-Uses OpenCSV and Eclipse RDF4J 2.1 snapshot
+Uses OpenCSV and Eclipse RDF4J 2.1 snapshot (prior versions don't include ROV / ORG)
