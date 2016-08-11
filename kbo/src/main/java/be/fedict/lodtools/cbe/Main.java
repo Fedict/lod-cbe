@@ -47,6 +47,7 @@ import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.FOAF;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.ORG;
+import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.ROV;
 import org.eclipse.rdf4j.model.vocabulary.SKOS;
 
@@ -66,20 +67,50 @@ public class Main {
     private final static SimpleDateFormat SDF = new SimpleDateFormat("dd-MM-yyyy");
     
     private static String domain = null;
+	
+	private final static String DOM_BELGIF = "http://org.belgif.be";
+	private final static String DOM_PREF_NACE = "http://vocab.belgif.be/nace2008/";
+	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
+	
     private final static String PREFIX_ORG = "/cbe/org/";
     private final static String PREFIX_REG = "/cbe/registration/";
     private final static String PREFIX_SITE = "/cbe/site/";
-    private final static String PREFIX_NACE = "/cbe/nace/";
     
-    
-    private static IRI makeID(String type, String str) {
-        return F.createIRI(new StringBuilder()
-                            .append(domain)
+    /**
+	 * Make unique ID for an organization or site
+	 * 
+	 * @param type organization or site
+	 * @param cbe CBE number as string
+	 * @return IRI
+	 */
+    private static IRI makeID(String type, String cbe) {
+        return F.createIRI(new StringBuilder(domain)
                             .append(type)
-                            .append(str.replaceAll("\\.", ""))
+                            .append(cbe.replaceAll("\\.", "_"))
                             .append("#id").toString());
     }
     
+	/**
+	 * Make OpenCorporates.com ID
+	 * 
+	 * @param cbe CBE number as string
+	 * @return IRI
+	 */
+	private static IRI makeOCID(String cbe) {
+		return F.createIRI(new StringBuilder(DOM_PREF_OC)
+							.append(cbe.replaceAll("\\.", "")).toString());
+	}
+	
+	/**
+	 * Make NACEbel ID
+	 * 
+	 * @param code NACEbel code as string
+	 * @return IRI
+	 */
+	private static IRI makeNACE(String code) {
+		return F.createIRI(new StringBuilder(DOM_PREF_NACE)
+								.append(code).toString());
+	}
     /**
      * Convert DD-MM-YYYY date string to date object
      * 
@@ -158,8 +189,13 @@ public class Main {
             case "4": lang = "en";
         }
         IRI pred = row[2].equals("001") ? ROV.LEGAL_NAME : SKOS.ALT_LABEL;
-        Statement s = F.createStatement(subj, pred, F.createLiteral(row[3], lang));
-        return Stream.of(s);
+		
+		Stream.Builder<Statement> s = Stream.builder();
+        s.add(F.createStatement(subj, pred, F.createLiteral(row[3], lang)));
+		if (row[0].startsWith("0")) {
+			s.add(F.createStatement(subj, OWL.SAMEAS, makeOCID(row[0])));
+		}
+        return s.build();
     };
     
     /**
@@ -215,9 +251,8 @@ public class Main {
      */
     private final static Function<String[],Stream<Statement>> Activities = row -> {
         IRI subj = makeID(row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE, row[0]);
-        IRI nace = makeID(PREFIX_NACE, row[2] + "/" + row[3]);
         
-        Statement s = F.createStatement(subj, ROV.ORG_ACTIVITY, nace);
+        Statement s = F.createStatement(subj, ROV.ORG_ACTIVITY, makeNACE(row[3]));
         return Stream.of(s);
     };
    
@@ -264,12 +299,12 @@ public class Main {
         }
         
         File base = new File(args[0]);
-        File outf = new File(args[1], "out.nt");
+        File outf = new File(args[1], "cbe.nt");
         
         if (args.length > 2 && args[2].startsWith("http")) {
             domain = args[2];
         } else {
-            domain = "http://org.belgif.be";
+            domain = DOM_BELGIF;
         }
         
         try (BufferedWriter w = new BufferedWriter(new FileWriter(outf))){
