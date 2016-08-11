@@ -151,6 +151,8 @@ public class Main {
      */
     private static IRI asPage(String page) {
         String s = page.toLowerCase().trim().split(" ", 1)[0];
+		s = s.replaceFirst("http//", "http://"); // correct malformed input
+		s = s.replaceFirst("https//", "https://");
         return F.createIRI(s.startsWith("http") ? s : "http://" + s);
     }
     
