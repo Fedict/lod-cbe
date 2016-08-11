@@ -83,11 +83,11 @@ public class Main {
     /**
 	 * Make unique ID for an organization or site
 	 * 
-	 * @param type organization or site
 	 * @param cbe CBE number as string
+	 * @param type organization or site
 	 * @return IRI
 	 */
-    private static IRI makeID(String type, String cbe) {
+    private static IRI makeID(String cbe, String type) {
         return F.createIRI(new StringBuilder(domain)
                             .append(type)
                             .append(cbe.replaceAll("\\.", "_"))
@@ -242,9 +242,9 @@ public class Main {
         IRI contact = null;
         
         switch(row[2]) {
-            case "TEL": type = FOAF.PHONE; contact = asPhone(row[2]); break;
-            case "WEB": type = FOAF.HOMEPAGE; contact = asPage(row[2]); break;
-            case "EMAIL": type = FOAF.MBOX; contact = asMail(row[2]); break;
+            case "TEL": type = FOAF.PHONE; contact = asPhone(row[3]); break;
+            case "WEB": type = FOAF.HOMEPAGE; contact = asPage(row[3]); break;
+            case "EMAIL": type = FOAF.MBOX; contact = asMail(row[3]); break;
         }
         Statement s = F.createStatement(subj, type, contact);
         return Stream.of(s);
@@ -286,7 +286,7 @@ public class Main {
         try (CsvBulkReader r = new CsvBulkReader(csv)) {
             while(r.hasNext()) {
                 r.readNext(lines).stream().flatMap(fun).forEach(rdf::handleStatement);
-				LOG.info("Reading lines");
+				LOG.debug("Reading lines");
             }
         }
     }
