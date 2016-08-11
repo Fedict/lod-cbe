@@ -57,7 +57,7 @@ import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
 
 /**
- * Convert open data CBE to RDF Triples.
+ * Convert open data CBE (Belgian company register) to RDF Triples.
  * 
  * @author Bart Hanssens <bart.hanssens@fedict.be>
  */
