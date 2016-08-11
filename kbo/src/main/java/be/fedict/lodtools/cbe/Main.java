@@ -55,6 +55,8 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Convert open data CBE (Belgian company register) to RDF Triples.
@@ -62,6 +64,8 @@ import org.eclipse.rdf4j.rio.Rio;
  * @author Bart Hanssens <bart.hanssens@fedict.be>
  */
 public class Main {
+	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
+ 
     private final static ValueFactory F = SimpleValueFactory.getInstance();
 
     private final static SimpleDateFormat SDF = new SimpleDateFormat("dd-MM-yyyy");
@@ -282,6 +286,7 @@ public class Main {
         try (CsvBulkReader r = new CsvBulkReader(csv)) {
             while(r.hasNext()) {
                 r.readNext(lines).stream().flatMap(fun).forEach(rdf::handleStatement);
+				LOG.info("Reading lines");
             }
         }
     }
@@ -306,14 +311,19 @@ public class Main {
         } else {
             domain = DOM_BELGIF;
         }
-        
+		
+        LOG.info("--- START ---");
+		LOG.info("Params in = {}, out = {}, domain = {}", base, outf, domain);
+		
         try (BufferedWriter w = new BufferedWriter(new FileWriter(outf))){
             RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
             rdf.startRDF();
             for(String file: MAP.keySet()) {
+				LOG.info("Reading CSV file {}", file);
                 add(rdf, new FileReader(new File(base, file)), MAP.get(file));
             }
             rdf.endRDF();
         }
+		LOG.info("--- END ---");
     }
 }
