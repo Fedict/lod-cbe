@@ -43,6 +43,7 @@ import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
+
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.FOAF;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -90,7 +91,7 @@ public class Main {
     private static IRI makeID(String type, String cbe) {
         return F.createIRI(new StringBuilder(domain)
                             .append(type)
-                            .append(cbe.replaceAll("\\.", "_"))
+                            .append(cbe.replaceAll("\\.", "_").replaceAll(" ", "%20"))
                             .append("#id").toString());
     }
     
@@ -102,7 +103,8 @@ public class Main {
 	 */
 	private static IRI makeOCID(String cbe) {
 		return F.createIRI(new StringBuilder(DOM_PREF_OC)
-							.append(cbe.replaceAll("\\.", "")).toString());
+							.append(cbe.replaceAll("\\.", "").replaceAll(" ", "%20"))
+							.toString());
 	}
 	
 	/**
