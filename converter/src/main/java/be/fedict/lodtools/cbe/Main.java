@@ -103,8 +103,7 @@ public class Main {
 	 */
 	private static IRI makeOCID(String cbe) {
 		return F.createIRI(new StringBuilder(DOM_PREF_OC)
-							.append(cbe.replaceAll("\\.", "").replaceAll(" ", "%20"))
-							.toString());
+							.append(cbe.replaceAll("\\.", "")).toString());
 	}
 	
 	/**
@@ -114,8 +113,7 @@ public class Main {
 	 * @return IRI
 	 */
 	private static IRI makeNACE(String code) {
-		return F.createIRI(new StringBuilder(DOM_PREF_NACE)
-								.append(code).toString());
+		return F.createIRI(new StringBuilder(DOM_PREF_NACE).append(code).toString());
 	}
     /**
      * Convert DD-MM-YYYY date string to date object
@@ -152,7 +150,7 @@ public class Main {
      * @return http: IRI
      */
     private static IRI asPage(String page) {
-        String s = page.toLowerCase().trim().split(" ", 1)[0];
+        String s = page.toLowerCase().trim().split(" ", 2)[0];
 		s = s.replaceFirst("http//", "http://"); // correct malformed input
 		s = s.replaceFirst("https//", "https://");
         return F.createIRI(s.startsWith("http") ? s : "http://" + s);
@@ -165,7 +163,7 @@ public class Main {
      * @return mailto: IRI
      */
     private static IRI asMail(String mail) {
-        String s = mail.toLowerCase().trim().split(" ", 1)[0];
+        String s = mail.toLowerCase().trim().split(" ", 2)[0];
         return F.createIRI("mailto:" + s);
     }
     
