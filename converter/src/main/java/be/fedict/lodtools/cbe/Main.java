@@ -40,6 +40,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
@@ -202,12 +203,13 @@ public class Main {
             case "1": lang = "fr"; break;
             case "2": lang = "nl"; break;
             case "3": lang = "de"; break;
-            case "4": lang = "en";
+            case "4": lang = "en"; break;
         }
         IRI pred = row[2].equals("001") ? ROV.LEGAL_NAME : SKOS.ALT_LABEL;
-		
+		Literal lit = (!lang.isEmpty()) ? F.createLiteral(row[3], lang)
+										: F.createLiteral(row[3]);
 		Stream.Builder<Statement> s = Stream.builder();
-        s.add(F.createStatement(subj, pred, F.createLiteral(row[3], lang)));
+        s.add(F.createStatement(subj, pred, lit));
         return s.build();
     };
     
