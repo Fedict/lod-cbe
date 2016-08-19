@@ -154,8 +154,9 @@ public class Main {
 		if (s.length() < 5) {
 			return null;
 		}
+		// correct malformed input
 		s = s.replaceFirst("http:\\\\", "http://");
-		s = s.replaceFirst("http//", "http://"); // correct malformed input
+		s = s.replaceFirst("http//", "http://"); 
 		s = s.replaceFirst("https//", "https://");
         return F.createIRI(s.startsWith("http") ? s : "http://" + s);
     }
@@ -171,6 +172,8 @@ public class Main {
 		if (s.length() < 7 || !s.contains("@")) {
 			return null;
 		}
+		// correct malformed input
+		s = s.replaceFirst("<", "").replaceFirst(">", "");
         return F.createIRI("mailto:" + s);
     }
     
