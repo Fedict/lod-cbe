@@ -154,6 +154,7 @@ public class Main {
 		if (s.length() < 5) {
 			return null;
 		}
+		s = s.replaceFirst("http:\\\\", "http://");
 		s = s.replaceFirst("http//", "http://"); // correct malformed input
 		s = s.replaceFirst("https//", "https://");
         return F.createIRI(s.startsWith("http") ? s : "http://" + s);
