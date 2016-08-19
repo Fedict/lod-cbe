@@ -147,10 +147,13 @@ public class Main {
      * Clean up and convert webpage to http: IRI.
      * 
      * @param page web page
-     * @return http: IRI
+     * @return http: IRI or null
      */
     private static IRI asPage(String page) {
         String s = page.toLowerCase().trim().split(" ", 2)[0];
+		if (s.length() < 5) {
+			return null;
+		}
 		s = s.replaceFirst("http//", "http://"); // correct malformed input
 		s = s.replaceFirst("https//", "https://");
         return F.createIRI(s.startsWith("http") ? s : "http://" + s);
@@ -160,10 +163,13 @@ public class Main {
      * Clean up and convert email address to mailto: IRI.
      * 
      * @param mail email address
-     * @return mailto: IRI
+     * @return mailto: IRI or null
      */
     private static IRI asMail(String mail) {
         String s = mail.toLowerCase().trim().split(" ", 2)[0];
+		if (s.length() < 7 || !s.contains("@")) {
+			return null;
+		}
         return F.createIRI("mailto:" + s);
     }
     
@@ -246,9 +252,11 @@ public class Main {
             case "WEB": type = FOAF.HOMEPAGE; contact = asPage(row[3]); break;
             case "EMAIL": type = FOAF.MBOX; contact = asMail(row[3]); break;
         }
-        Statement s = F.createStatement(subj, type, contact);
-        return Stream.of(s);
-    };
+		if (contact == null) {
+			return Stream.empty();
+		}
+		return Stream.of(F.createStatement(subj, type, contact));
+	};
    
     /**
      * Generate stream of activities
@@ -256,8 +264,7 @@ public class Main {
     private final static Function<String[],Stream<Statement>> Activities = row -> {
         IRI subj = makeID(row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE, row[0]);
         
-        Statement s = F.createStatement(subj, ROV.ORG_ACTIVITY, makeNACE(row[3]));
-        return Stream.of(s);
+        return Stream.of(F.createStatement(subj, ROV.ORG_ACTIVITY, makeNACE(row[3])));
     };
    
     /**
