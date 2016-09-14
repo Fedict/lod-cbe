@@ -34,10 +34,11 @@ import com.bigdata.rdf.sail.webapp.client.RemoteRepositoryManager;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
+import java.net.URL;
 
 
 /**
- * Main dropwizard web application
+ * Main Dropwizard web application
  * 
  * @author Bart.Hanssens
  */
@@ -49,13 +50,13 @@ public class App extends Application<AppConfig> {
 	
 	@Override
     public void run(AppConfig config, Environment env) {
-		String remote = "http://org.belgif.be";
 		
 		// RDF Serialization formats
 		env.jersey().register(new RDFMessageBodyWriter());
 		
 		// Managed resource
-		final RemoteRepositoryManager mgr = new RemoteRepositoryManager(remote);
+		String endpoint = config.getSparqlPoint();
+		final RemoteRepositoryManager mgr = new RemoteRepositoryManager(endpoint);
 		BlazegraphManager blaze = new BlazegraphManager(mgr);
 		env.lifecycle().manage(blaze);
 		

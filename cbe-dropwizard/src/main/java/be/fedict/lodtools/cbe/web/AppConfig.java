@@ -29,13 +29,23 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.dropwizard.Configuration;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.URL;
 
 /**
  *
  * @author Bart.Hanssens
  */
 public class AppConfig extends Configuration {
+	@URL
+	private String sparqlPoint;
 
+	@JsonProperty
+	public String getSparqlPoint() {
+		return sparqlPoint;
+	}
+	
+	@JsonProperty
+	public void setSparqlPoint(String sparqlPoint) {
+		this.sparqlPoint = sparqlPoint;
+	}	
 }
