@@ -34,8 +34,6 @@ import java.util.Map;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import org.eclipse.rdf4j.model.vocabulary.OWL;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
 
 import org.openrdf.model.Literal;
 import org.openrdf.model.Model;
@@ -44,6 +42,8 @@ import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.DCTERMS;
 import org.openrdf.model.vocabulary.SKOS;
+import org.openrdf.model.vocabulary.OWL;
+import org.openrdf.model.vocabulary.RDF;
 
 import org.openrdf.query.GraphQuery;
 import org.openrdf.query.MalformedQueryException;

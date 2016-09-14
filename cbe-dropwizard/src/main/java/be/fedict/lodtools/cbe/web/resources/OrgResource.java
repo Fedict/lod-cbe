@@ -43,7 +43,7 @@ import org.openrdf.model.Value;
  * @author Bart.Hanssens
  */
 @Path("/cbe/{type: org|site}/{id}")
-@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES})
+@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES, RDFMediaType.TTL})
 public class OrgResource extends RdfResource {
 	private final static String Q_ORG_FULL = 
 			"CONSTRUCT { ?org ?p ?o } "

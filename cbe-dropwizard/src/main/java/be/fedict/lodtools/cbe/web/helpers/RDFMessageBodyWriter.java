@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Produces;
 
 import javax.ws.rs.WebApplicationException;
@@ -37,26 +39,27 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import org.eclipse.rdf4j.model.Model;
-import org.eclipse.rdf4j.rio.RDFFormat;
-import org.eclipse.rdf4j.rio.Rio;
+import org.openrdf.model.Model;
+import org.openrdf.rio.RDFFormat;
+import org.openrdf.rio.RDFHandlerException;
+import org.openrdf.rio.Rio;
 
 /**
- * Turtle Writer
+ * RDF Writer
  * 
  * @author Bart.Hanssens
  */
 @Provider
-@Produces({RDFMediaType.TTL, RDFMediaType.JSONLD, RDFMediaType.NTRIPLES})
+@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES, RDFMediaType.TTL})
 public class RDFMessageBodyWriter implements MessageBodyWriter<Model> {
 	@Override
 	public boolean isWriteable(Class<?> type, Type generic, Annotation[] antns, MediaType mt) {
-		return type == Model.class;
+		return generic == Model.class;
 	}
 
 	@Override
 	public long getSize(Model m, Class<?> type, Type generic, Annotation[] antns, MediaType mt) {
-		return 0; // ignored anyway
+		return 0; // ignored by Jersey 2.0 anyway
 	}
 
 	@Override
@@ -69,6 +72,10 @@ public class RDFMessageBodyWriter implements MessageBodyWriter<Model> {
 			case RDFMediaType.TTL: fmt = RDFFormat.TURTLE; break;
 			default: fmt = RDFFormat.JSONLD; break;
 		}
-		Rio.write(m, out, fmt);
+		try {
+			Rio.write(m, out, fmt);
+		} catch (RDFHandlerException ex) {
+			throw new WebApplicationException(ex);
+		}
 	}
 }

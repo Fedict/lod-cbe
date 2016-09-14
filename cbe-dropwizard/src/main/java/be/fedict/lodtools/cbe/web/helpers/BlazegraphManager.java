@@ -31,7 +31,8 @@ import com.bigdata.rdf.sail.webapp.client.RemoteRepositoryManager;
 import io.dropwizard.lifecycle.Managed;
 
 /**
- *
+ * Turn triple store repository into a managed resource
+ * 
  * @author Bart.Hanssens
  */
 public class BlazegraphManager implements Managed {

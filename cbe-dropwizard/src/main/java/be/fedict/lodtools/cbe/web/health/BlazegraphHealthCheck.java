@@ -29,7 +29,8 @@ import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
 import com.codahale.metrics.health.HealthCheck;
 
 /**
- *
+ * Check if triple store can be reached
+ * 
  * @author Bart.Hanssens
  */
 public class BlazegraphHealthCheck extends HealthCheck {
@@ -42,6 +43,11 @@ public class BlazegraphHealthCheck extends HealthCheck {
 								: Result.unhealthy("Triplestore unreachable");
 	}
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param cbe 
+	 */
 	public BlazegraphHealthCheck(BigdataSailRemoteRepository cbe) {
 		this.cbe = cbe;
 	}
