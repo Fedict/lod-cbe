@@ -42,12 +42,13 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
 /**
- * JSON LD Writer
+ * Turtle Writer
+ * 
  * @author Bart.Hanssens
  */
 @Provider
-@Produces(RDFMediaType.JSONLD)
-public class JSONLDMessageBodyWriter implements MessageBodyWriter<Model> {
+@Produces({RDFMediaType.TTL, RDFMediaType.JSONLD, RDFMediaType.NTRIPLES})
+public class RDFMessageBodyWriter implements MessageBodyWriter<Model> {
 	@Override
 	public boolean isWriteable(Class<?> type, Type generic, Annotation[] antns, MediaType mt) {
 		return type == Model.class;
@@ -55,13 +56,19 @@ public class JSONLDMessageBodyWriter implements MessageBodyWriter<Model> {
 
 	@Override
 	public long getSize(Model m, Class<?> type, Type generic, Annotation[] antns, MediaType mt) {
-		throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+		return 0; // ignored anyway
 	}
 
 	@Override
 	public void writeTo(Model m, Class<?> type, Type generic, Annotation[] antns, MediaType mt, 
 										MultivaluedMap<String, Object> mm, OutputStream out) 
 									throws IOException, WebApplicationException {
-		Rio.write(m, out, RDFFormat.JSONLD);
+		RDFFormat fmt;
+		switch(mt.toString()) {
+			case RDFMediaType.NTRIPLES: fmt = RDFFormat.NTRIPLES; break;
+			case RDFMediaType.TTL: fmt = RDFFormat.TURTLE; break;
+			default: fmt = RDFFormat.JSONLD; break;
+		}
+		Rio.write(m, out, fmt);
 	}
 }

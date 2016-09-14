@@ -42,7 +42,7 @@ import org.openrdf.model.Value;
  *
  * @author Bart.Hanssens
  */
-@Path("/cbe/org/{id}")
+@Path("/cbe/{type: org|site}/{id}")
 @Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES})
 public class OrgResource extends RdfResource {
 	private final static String Q_ORG_FULL = 
@@ -50,9 +50,9 @@ public class OrgResource extends RdfResource {
 			+ "WHERE { ?org ?p ?o }";
 		
 	@GET
-	public Model getOrganisation(@PathParam("id") String id) {
+	public Model getOrganisation(@PathParam("type") String type, @PathParam("id") String id) {
 		Map<String,Value> map = new HashMap();
-		map.put("org", asURI("http://org.belgif.be/cbe/org/" + id + "#id"));
+		map.put("org", asURI("http://org.belgif.be/cbe/" + type + "/" + id + "#id"));
 		return prepare(Q_ORG_FULL, map);
 	}
 	

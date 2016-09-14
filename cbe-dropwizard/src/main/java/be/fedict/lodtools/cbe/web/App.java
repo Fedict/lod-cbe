@@ -27,8 +27,7 @@ package be.fedict.lodtools.cbe.web;
 
 import be.fedict.lodtools.cbe.web.health.BlazegraphHealthCheck;
 import be.fedict.lodtools.cbe.web.helpers.BlazegraphManager;
-import be.fedict.lodtools.cbe.web.helpers.JSONLDMessageBodyWriter;
-import be.fedict.lodtools.cbe.web.helpers.NTriplesMessageBodyWriter;
+import be.fedict.lodtools.cbe.web.helpers.RDFMessageBodyWriter;
 import be.fedict.lodtools.cbe.web.resources.OrgResource;
 
 import com.bigdata.rdf.sail.webapp.client.RemoteRepositoryManager;
@@ -52,9 +51,8 @@ public class App extends Application<AppConfig> {
     public void run(AppConfig config, Environment env) {
 		String remote = "http://org.belgif.be";
 		
-		// Serialization formats
-		env.jersey().register(new JSONLDMessageBodyWriter());
-		env.jersey().register(new NTriplesMessageBodyWriter());
+		// RDF Serialization formats
+		env.jersey().register(new RDFMessageBodyWriter());
 		
 		// Managed resource
 		final RemoteRepositoryManager mgr = new RemoteRepositoryManager(remote);
