@@ -25,10 +25,12 @@
  */
 package be.fedict.lodtools.cbe.web;
 
+import be.fedict.lodtools.cbe.web.health.BlazegraphHealthCheck;
+import be.fedict.lodtools.cbe.web.helpers.BlazegraphManager;
 import be.fedict.lodtools.cbe.web.helpers.JSONLDMessageBodyWriter;
 import be.fedict.lodtools.cbe.web.helpers.NTriplesMessageBodyWriter;
 import be.fedict.lodtools.cbe.web.resources.OrgResource;
-import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
+
 import com.bigdata.rdf.sail.webapp.client.RemoteRepositoryManager;
 
 import io.dropwizard.Application;
@@ -48,20 +50,27 @@ public class App extends Application<AppConfig> {
 	
 	@Override
     public void run(AppConfig config, Environment env) {
-		String remote = "http://org.belgif.be/blazegraph";
-				
-		final RemoteRepositoryManager mgr = new RemoteRepositoryManager(remote);
-		BigdataSailRemoteRepository cbe = mgr.getRepositoryForNamespace("cbe")
-											.getBigdataSailRemoteRepository();
+		String remote = "http://org.belgif.be";
 		
-
-		env.jersey().register(new OrgResource(cbe));
+		// Serialization formats
 		env.jersey().register(new JSONLDMessageBodyWriter());
 		env.jersey().register(new NTriplesMessageBodyWriter());
+		
+		// Managed resource
+		final RemoteRepositoryManager mgr = new RemoteRepositoryManager(remote);
+		BlazegraphManager blaze = new BlazegraphManager(mgr);
+		env.lifecycle().manage(blaze);
+		
+		// Monitoring
+		final BlazegraphHealthCheck check = new BlazegraphHealthCheck(blaze.getCbe());
+		env.healthChecks().register("blazegraph", check);
+		
+		env.jersey().register(new OrgResource(blaze.getCbe()));
 	}
 	
 	/**
 	 * Main 
+	 * 
 	 * @param args
 	 * @throws Exception 
 	 */

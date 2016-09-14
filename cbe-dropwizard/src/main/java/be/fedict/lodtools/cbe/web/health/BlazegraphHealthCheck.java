@@ -23,40 +23,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.cbe.web.resources;
+package be.fedict.lodtools.cbe.web.health;
 
-import be.fedict.lodtools.cbe.web.helpers.RDFMediaType;
 import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
-import org.openrdf.model.Model;
-import org.openrdf.model.Value;
+import com.codahale.metrics.health.HealthCheck;
 
 /**
  *
  * @author Bart.Hanssens
  */
-@Path("/cbe/org/{id}")
-@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES})
-public class OrgResource extends RdfResource {
-	private final static String Q_ORG_FULL = 
-			"CONSTRUCT { ?org ?p ?o } "
-			+ "WHERE { ?org ?p ?o }";
-		
-	@GET
-	public Model getOrganisation(@PathParam("id") String id) {
-		Map<String,Value> map = new HashMap();
-		map.put("org", asURI("http://org.belgif.be/cbe/org/" + id + "#id"));
-		return prepare(Q_ORG_FULL, map);
+public class BlazegraphHealthCheck extends HealthCheck {
+	private final BigdataSailRemoteRepository cbe;
+	
+	@Override
+	protected Result check() throws Exception {
+		return cbe.getConnection().isOpen() 
+								? Result.healthy() 
+								: Result.unhealthy("Triplestore unreachable");
 	}
 	
-	public OrgResource(BigdataSailRemoteRepository repo) {
-		super(repo);
+	public BlazegraphHealthCheck(BigdataSailRemoteRepository cbe) {
+		this.cbe = cbe;
 	}
 }

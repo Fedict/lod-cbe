@@ -23,40 +23,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.cbe.web.resources;
+package be.fedict.lodtools.cbe.web.helpers;
 
-import be.fedict.lodtools.cbe.web.helpers.RDFMediaType;
 import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
-import java.util.HashMap;
-import java.util.Map;
+import com.bigdata.rdf.sail.webapp.client.RemoteRepositoryManager;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
-import org.openrdf.model.Model;
-import org.openrdf.model.Value;
+import io.dropwizard.lifecycle.Managed;
 
 /**
  *
  * @author Bart.Hanssens
  */
-@Path("/cbe/org/{id}")
-@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES})
-public class OrgResource extends RdfResource {
-	private final static String Q_ORG_FULL = 
-			"CONSTRUCT { ?org ?p ?o } "
-			+ "WHERE { ?org ?p ?o }";
-		
-	@GET
-	public Model getOrganisation(@PathParam("id") String id) {
-		Map<String,Value> map = new HashMap();
-		map.put("org", asURI("http://org.belgif.be/cbe/org/" + id + "#id"));
-		return prepare(Q_ORG_FULL, map);
+public class BlazegraphManager implements Managed {
+	private final RemoteRepositoryManager mgr;
+	private BigdataSailRemoteRepository cbe;
+
+	@Override
+	public void start() throws Exception {
+	}
+
+	@Override
+	public void stop() throws Exception {
+		cbe.shutDown();
+		mgr.close();
+	}
+
+	public BigdataSailRemoteRepository getCbe() {
+		return cbe;
 	}
 	
-	public OrgResource(BigdataSailRemoteRepository repo) {
-		super(repo);
+	public BlazegraphManager(RemoteRepositoryManager mgr) {
+		this.mgr = mgr;
+		this.cbe = mgr.getRepositoryForNamespace("cbe").getBigdataSailRemoteRepository();
 	}
 }
