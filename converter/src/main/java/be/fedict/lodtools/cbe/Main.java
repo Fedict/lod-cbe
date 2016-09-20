@@ -82,6 +82,8 @@ public class Main {
     private final static String PREFIX_REG = "/cbe/registration/";
     private final static String PREFIX_SITE = "/cbe/site/";
     
+	private final static String SUFFIX_ID = "#id";
+	
     /**
 	 * Make unique ID for an organization or site
 	 * 
@@ -93,7 +95,7 @@ public class Main {
         return F.createIRI(new StringBuilder(domain)
                             .append(type)
                             .append(cbe.replaceAll("\\.", "_").replaceAll(" ", "%20"))
-                            .append("#id").toString());
+                            .append(SUFFIX_ID).toString());
     }
     
 	/**
@@ -114,7 +116,8 @@ public class Main {
 	 * @return IRI
 	 */
 	private static IRI makeNACE(String code) {
-		return F.createIRI(new StringBuilder(DOM_PREF_NACE).append(code).toString());
+		return F.createIRI(new StringBuilder(DOM_PREF_NACE)
+				.append(code).append(SUFFIX_ID).toString());
 	}
     /**
      * Convert DD-MM-YYYY date string to date object
