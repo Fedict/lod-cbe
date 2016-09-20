@@ -23,40 +23,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.cbe.web.resources;
+package be.fedict.lodtools.cbe.web.health;
 
-import be.fedict.lodtools.cbe.web.helpers.RDFMediaType;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
-import org.openrdf.model.Model;
+import com.codahale.metrics.health.HealthCheck;
 import org.openrdf.repository.Repository;
 
 /**
- *
+ * Check if triple store can be reached
+ * 
  * @author Bart.Hanssens
  */
-
-@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES, RDFMediaType.TTL})
-public class OrgResource extends RdfResource {
-	private final static String PREFIX = "http://org.belgif.be/cbe/";
-
-	@GET
-	@Path("/cbe/{type: org|registration|site}/{id}")
-	public Model getOrganisation(@PathParam("type") String type, @PathParam("id") String id) {
-		return getById(PREFIX, type, id);
+public class RdfStoreHealthCheck extends HealthCheck {
+	private final Repository repo;
+	
+	@Override
+	protected Result check() throws Exception {
+		return repo.getConnection().isOpen() 
+								? Result.healthy() 
+								: Result.unhealthy("Triplestore unreachable");
 	}
 	
-	@GET
-	@Path("/cbe/{type: org|registration|site}/_search?q={text}")
-	public Model searchOrganisation(@PathParam("type") String type, @PathParam("text") String text) {
-		return getFTS(PREFIX, type, text);
-	}
-			
-	public OrgResource(Repository repo) {
-		super(repo);
+	/**
+	 * Constructor
+	 * 
+	 * @param rebo (remote) repository
+	 */
+	public RdfStoreHealthCheck(Repository repo) {
+		this.repo = repo;
 	}
 }

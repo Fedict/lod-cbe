@@ -23,38 +23,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.cbe.web.helpers;
+package be.fedict.lodtools.cbe.web.resources;
 
-import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
-import com.bigdata.rdf.sail.webapp.client.RemoteRepositoryManager;
+import be.fedict.lodtools.cbe.web.helpers.RDFMediaType;
 
-import io.dropwizard.lifecycle.Managed;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.openrdf.model.Model;
+import org.openrdf.repository.Repository;
 
 /**
- * Turn triple store repository into a managed resource
- * 
+ *
  * @author Bart.Hanssens
  */
-public class BlazegraphManager implements Managed {
-	private final RemoteRepositoryManager mgr;
-	private BigdataSailRemoteRepository cbe;
-
-	@Override
-	public void start() throws Exception {
-	}
-
-	@Override
-	public void stop() throws Exception {
-		cbe.shutDown();
-		mgr.close();
-	}
-
-	public BigdataSailRemoteRepository getCbe() {
-		return cbe;
+@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES, RDFMediaType.TTL})
+public class VocabResource extends RdfResource {
+	private final static String PREFIX = "http://vocab.belgif.be/";
+		
+	@GET
+	@Path("/{type: nace2008|nis2008}/{id}")
+	public Model getVocab(@PathParam("type") String type, @PathParam("id") String id) {
+		return getById(PREFIX, type, id);
 	}
 	
-	public BlazegraphManager(RemoteRepositoryManager mgr) {
-		this.mgr = mgr;
-		this.cbe = mgr.getRepositoryForNamespace("cbe").getBigdataSailRemoteRepository();
+	public VocabResource(Repository repo) {
+		super(repo);
 	}
 }

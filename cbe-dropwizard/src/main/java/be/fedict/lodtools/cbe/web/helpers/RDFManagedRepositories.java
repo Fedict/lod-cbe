@@ -23,67 +23,59 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.cbe.web;
+package be.fedict.lodtools.cbe.web.helpers;
 
-import be.fedict.lodtools.cbe.web.health.RdfStoreHealthCheck;
-import be.fedict.lodtools.cbe.web.helpers.RDFManagedRepositories;
-import be.fedict.lodtools.cbe.web.helpers.RDFMessageBodyWriter;
-import be.fedict.lodtools.cbe.web.resources.CpsvResource;
-import be.fedict.lodtools.cbe.web.resources.GeoResource;
-import be.fedict.lodtools.cbe.web.resources.OrgResource;
-import be.fedict.lodtools.cbe.web.resources.VocabResource;
 import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
-
 import com.bigdata.rdf.sail.webapp.client.RemoteRepositoryManager;
 
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import java.net.URL;
+import io.dropwizard.lifecycle.Managed;
+import java.util.HashMap;
+import java.util.Map;
 import org.openrdf.repository.Repository;
 
-
 /**
- * Main Dropwizard web application
+ * Turn triple store repositories into managed resource(s).
  * 
  * @author Bart.Hanssens
  */
-public class App extends Application<AppConfig> {
-	@Override
-	public String getName() {
-		return "lod-cbe";
-	}
+public class RDFManagedRepositories implements Managed {
+	private final RemoteRepositoryManager mgr;
+	private final Map<String, Repository> map;
 	
 	@Override
-    public void run(AppConfig config, Environment env) {
-		
-		// RDF Serialization formats
-		env.jersey().register(new RDFMessageBodyWriter());
-		
-		// Managed resource
-		String endpoint = config.getSparqlPoint();
-		final RemoteRepositoryManager mgr = new RemoteRepositoryManager(endpoint);
-		RDFManagedRepositories blaze = new RDFManagedRepositories(mgr);
-		Repository repo = blaze.getRepo("cbe");
-		env.lifecycle().manage(blaze);
-		
-		// Monitoring
-		final RdfStoreHealthCheck check = new RdfStoreHealthCheck(repo);
-		env.healthChecks().register("triplesstore", check);
+	public void start() throws Exception {
+	}
 
-		
-		env.jersey().register(new OrgResource(blaze.getRepo("cbe")));
-		env.jersey().register(new GeoResource(blaze.getRepo("geo")));
-		env.jersey().register(new VocabResource(blaze.getRepo("vocab")));
-		env.jersey().register(new CpsvResource(blaze.getRepo("cpsv")));
+	@Override
+	public void stop() throws Exception {
+		for (Repository repo : map.values()) {
+			repo.shutDown();
+		}
+		mgr.close();
+	}
+
+	/**
+	 * Get a repository from the repository manager
+	 * 
+	 * @param repo name of the repository
+	 * @return 
+	 */
+	public Repository getRepo(String repo) {
+		BigdataSailRemoteRepository remote = (BigdataSailRemoteRepository) map.get(repo);
+		if (remote == null) {
+			remote = mgr.getRepositoryForNamespace(repo).getBigdataSailRemoteRepository();
+			map.put(repo, remote);
+		}
+		return remote;
 	}
 	
 	/**
-	 * Main 
+	 * Constructor
 	 * 
-	 * @param args
-	 * @throws Exception 
+	 * @param mgr repo manager to manage
 	 */
-	public static void main(String[] args) throws Exception {
-		new App().run(args);
+	public RDFManagedRepositories(RemoteRepositoryManager mgr) {
+		this.map = new HashMap();
+		this.mgr = mgr;
 	}
 }

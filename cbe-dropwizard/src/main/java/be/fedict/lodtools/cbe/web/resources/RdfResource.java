@@ -29,6 +29,7 @@ import be.fedict.lodtools.cbe.web.helpers.RDFMediaType;
 
 import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
 import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepositoryConnection;
+import java.util.HashMap;
 
 import java.util.Map;
 
@@ -41,6 +42,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.DCTERMS;
+import org.openrdf.model.vocabulary.FOAF;
 import org.openrdf.model.vocabulary.SKOS;
 import org.openrdf.model.vocabulary.OWL;
 import org.openrdf.model.vocabulary.RDF;
@@ -50,6 +52,8 @@ import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResults;
+import org.openrdf.repository.Repository;
+import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 
 
@@ -61,9 +65,19 @@ import org.openrdf.repository.RepositoryException;
 
 @Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES})
 public abstract class RdfResource {
-	private final BigdataSailRemoteRepository repo;
+	private final Repository repo;
 	private final ValueFactory fac;
 	
+	private final static String Q_IRI = 
+			"CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }";
+	
+	private final static String Q_FTS = 
+			"PREFIX bds: <http://www.bigdata.com/rdf/search#> "
+			+ "CONSTRUCT { ?s ?p ?o } WHERE { "
+			+ "?o bds:lit ?fts . "
+			+ "?s ?p o } "
+			+ "LIMIT 100";
+		
 	/**
 	 * Get string as URI
 	 * 
@@ -92,7 +106,7 @@ public abstract class RdfResource {
 	 */
 	protected Model prepare(String qry, Map<String,Value> bindings) {
 		try {
-			BigdataSailRemoteRepositoryConnection conn = this.repo.getConnection();
+			RepositoryConnection conn = this.repo.getConnection();
 			GraphQuery gq = conn.prepareGraphQuery(QueryLanguage.SPARQL, qry);
 			bindings.forEach((k,v) -> gq.setBinding(k, v));
 			
@@ -100,6 +114,7 @@ public abstract class RdfResource {
 			conn.close();
 			
 			m.setNamespace(DCTERMS.PREFIX, DCTERMS.NAMESPACE);
+			m.setNamespace(FOAF.PREFIX, FOAF.NAMESPACE);
 			m.setNamespace(OWL.PREFIX, OWL.NAMESPACE);
 			m.setNamespace(RDF.PREFIX, RDF.NAMESPACE);
 			m.setNamespace(SKOS.PREFIX, SKOS.NAMESPACE);
@@ -111,11 +126,39 @@ public abstract class RdfResource {
 	}
 	
 	/**
+	 * Get by ID (URI)
+	 * 
+	 * @param prefix
+	 * @param type
+	 * @param id
+	 * @return RDF model 
+	 */
+	protected Model getById(String prefix, String type, String id) {
+		Map<String,Value> map = new HashMap();
+		map.put("subj", asURI(prefix + type + "/" + id + "#id"));
+		return prepare(Q_IRI, map);
+	}
+	
+	/**
+	 * Full text search
+	 * 
+	 * @param prefix
+	 * @param type
+	 * @param text
+	 * @return RDF model 
+	 */
+	protected Model getFTS(String prefix, String type, String text) {
+		Map<String,Value> map = new HashMap();
+		map.put("fts", asLiteral(text + "*"));
+		return prepare(Q_FTS, map);
+	}
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param repo 
 	 */
-	public RdfResource(BigdataSailRemoteRepository repo) {
+	public RdfResource(Repository repo) {
 		this.repo = repo;
 		this.fac = repo.getValueFactory();
 	}

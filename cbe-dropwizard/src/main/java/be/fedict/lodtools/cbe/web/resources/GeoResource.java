@@ -23,32 +23,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.cbe.web.health;
+package be.fedict.lodtools.cbe.web.resources;
 
-import com.bigdata.rdf.sail.remote.BigdataSailRemoteRepository;
-import com.codahale.metrics.health.HealthCheck;
+import be.fedict.lodtools.cbe.web.helpers.RDFMediaType;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.openrdf.model.Model;
+import org.openrdf.repository.Repository;
 
 /**
- * Check if triple store can be reached
- * 
+ *
  * @author Bart.Hanssens
  */
-public class BlazegraphHealthCheck extends HealthCheck {
-	private final BigdataSailRemoteRepository cbe;
-	
-	@Override
-	protected Result check() throws Exception {
-		return cbe.getConnection().isOpen() 
-								? Result.healthy() 
-								: Result.unhealthy("Triplestore unreachable");
+
+@Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES, RDFMediaType.TTL})
+public class GeoResource extends RdfResource {
+	private final static String PREFIX = "http://geo.belgif.be/";
+		
+	@GET
+	@Path("{type: statsect}/{id}")
+	public Model getOrganisation(@PathParam("type") String type, @PathParam("id") String id) {
+		return getById(PREFIX, type, id);
 	}
 	
-	/**
-	 * Constructor
-	 * 
-	 * @param cbe 
-	 */
-	public BlazegraphHealthCheck(BigdataSailRemoteRepository cbe) {
-		this.cbe = cbe;
+	public GeoResource(Repository repo) {
+		super(repo);
 	}
 }

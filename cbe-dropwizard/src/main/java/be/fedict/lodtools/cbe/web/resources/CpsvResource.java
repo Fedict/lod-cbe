@@ -41,8 +41,8 @@ import org.openrdf.repository.Repository;
  */
 
 @Produces({RDFMediaType.JSONLD, RDFMediaType.NTRIPLES, RDFMediaType.TTL})
-public class OrgResource extends RdfResource {
-	private final static String PREFIX = "http://org.belgif.be/cbe/";
+public class CpsvResource extends RdfResource {
+	private final static String PREFIX = "http://pubserv.belgif.be/";
 
 	@GET
 	@Path("/cbe/{type: org|registration|site}/{id}")
@@ -50,13 +50,7 @@ public class OrgResource extends RdfResource {
 		return getById(PREFIX, type, id);
 	}
 	
-	@GET
-	@Path("/cbe/{type: org|registration|site}/_search?q={text}")
-	public Model searchOrganisation(@PathParam("type") String type, @PathParam("text") String text) {
-		return getFTS(PREFIX, type, text);
-	}
-			
-	public OrgResource(Repository repo) {
+	public CpsvResource(Repository repo) {
 		super(repo);
 	}
 }
