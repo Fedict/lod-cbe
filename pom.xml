@@ -7,7 +7,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>converter</module>
-        <module>cbe-dropwizard</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
