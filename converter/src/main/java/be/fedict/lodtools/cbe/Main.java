@@ -25,11 +25,16 @@
  */
 package be.fedict.lodtools.cbe;
 
+import com.google.common.base.Charsets;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -295,7 +300,7 @@ public class Main {
      * @param fun function generating RDF triples
      * @throws IOException 
      */
-    private static void add(RDFHandler rdf, FileReader csv, 
+    private static void add(RDFHandler rdf, Reader csv, 
                             Function<String[],Stream<Statement>> fun) throws IOException {
         int lines = 10000;
   
@@ -331,12 +336,14 @@ public class Main {
         LOG.info("--- START ---");
 		LOG.info("Params in = {}, out = {}, domain = {}", base, outf, domain);
 		
-        try (BufferedWriter w = new BufferedWriter(new FileWriter(outf))){
+        try (	FileOutputStream fout = new FileOutputStream(outf);
+				BufferedWriter w = new BufferedWriter(new OutputStreamWriter(fout, Charsets.UTF_8))){
             RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
             rdf.startRDF();
             for(String file: MAP.keySet()) {
 				LOG.info("Reading CSV file {}", file);
-                add(rdf, new FileReader(new File(base, file)), MAP.get(file));
+				InputStream fin = new FileInputStream(new File(base, file));
+                add(rdf, new InputStreamReader(fin, Charsets.UTF_8), MAP.get(file));
             }
             rdf.endRDF();
         }
