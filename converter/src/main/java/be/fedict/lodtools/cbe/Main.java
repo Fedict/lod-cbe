@@ -55,6 +55,7 @@ import org.eclipse.rdf4j.model.vocabulary.FOAF;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.ORG;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
+import org.eclipse.rdf4j.model.vocabulary.RDFS;
 import org.eclipse.rdf4j.model.vocabulary.ROV;
 import org.eclipse.rdf4j.model.vocabulary.SKOS;
 
@@ -80,7 +81,9 @@ public class Main {
     private static String domain = null;
 	
 	private final static String DOM_BELGIF = "http://org.belgif.be";
-	private final static String DOM_PREF_NACE = "http://vocab.belgif.be/nace2008/";
+	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/nace2008/";
+	private final static String DOM_PREF_NACE3 = "http://vocab.belgif.be/nace2003/";
+	
 	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
 	
     private final static String PREFIX_ORG = "/cbe/org/";
@@ -118,12 +121,15 @@ public class Main {
 	 * Make NACEbel ID
 	 * 
 	 * @param code NACEbel code as string
+	 * @param code NACEbel version
 	 * @return IRI
 	 */
-	private static IRI makeNACE(String code) {
-		return F.createIRI(new StringBuilder(DOM_PREF_NACE)
+	private static IRI makeNACE(String code, String ver) {
+		String prefix = ver.startsWith("2003") ? DOM_PREF_NACE3 : DOM_PREF_NACE8;
+		return F.createIRI(new StringBuilder(prefix)
 				.append(code).append(SUFFIX_ID).toString());
 	}
+	
     /**
      * Convert DD-MM-YYYY date string to date object
      * 
@@ -218,6 +224,13 @@ public class Main {
 										: F.createLiteral(row[3]);
 		Stream.Builder<Statement> s = Stream.builder();
         s.add(F.createStatement(subj, pred, lit));
+		
+		// Add label for query / display purposes
+		if (pred.equals(ROV.LEGAL_NAME) ||
+				(row[0].startsWith("2") && pred.equals(SKOS.ALT_LABEL))) {
+			s.add(F.createStatement(subj, RDFS.LABEL, lit));
+		}
+		
         return s.build();
     };
     
@@ -277,8 +290,7 @@ public class Main {
      */
     private final static Function<String[],Stream<Statement>> Activities = row -> {
         IRI subj = makeID(row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE, row[0]);
-        
-        return Stream.of(F.createStatement(subj, ROV.ORG_ACTIVITY, makeNACE(row[3])));
+        return Stream.of(F.createStatement(subj, ROV.ORG_ACTIVITY, makeNACE(row[3], row[2])));
     };
    
     /**
