@@ -89,6 +89,7 @@ public class Main {
     private final static String PREFIX_ORG = "/cbe/org/";
     private final static String PREFIX_REG = "/cbe/registration/";
     private final static String PREFIX_SITE = "/cbe/site/";
+	private final static String PREFIX_TYPE = "/cbe/type";
     
 	private final static String SUFFIX_ID = "#id";
 	
@@ -240,11 +241,13 @@ public class Main {
     private final static Function<String[],Stream<Statement>> Org = row -> {
         IRI subj = makeID(PREFIX_ORG, row[0]);
         IRI reg = makeID(PREFIX_REG, row[0]);
+		IRI type = makeID(PREFIX_TYPE, row[4]);
         Date date = asDate(row[5]);
         
         Stream.Builder<Statement> s = Stream.builder();
         s.add(F.createStatement(subj, RDF.TYPE, ROV.REGISTERED_ORGANIZATION))
             .add(F.createStatement(subj, ROV.REGISTRATION, reg))
+			.add(F.createStatement(subj, ROV.ORG_TYPE, type))
 			.add(F.createStatement(subj, OWL.SAMEAS, makeOCID(row[0])))
             .add(F.createStatement(reg, DCTERMS.ISSUED, F.createLiteral(date)));
         return s.build();
