@@ -14,7 +14,7 @@ Java 8 command line tool to convert CSV dump of the KBO/BCE (the official compan
 
 * Unzip the contents of this ZIP file (several CSV files) in a local directory, this requires about 1.5 GB disk space.
 
-* Run the conversion tool with parameters `input-dir export-dir site-prefix` (e.g. `java -jar cbe-converter.jar c:\data\kbo\csv c:\data\kbo\rdf http://org.belgif.be`), this may take several minutes on a fast PC with an SSD, and requires almost 5 GB disk space.
+* Run the conversion tool with parameters `input-dir export-dir site-prefix` (e.g. `java -jar cbe-converter.jar c:\data\kbo\csv c:\data\kbo\rdf http://org.belgif.be`), this may take several minutes on a fast PC with an SSD, and requires almost 5 GB disk space. Make sure your OS / filesystem supports files larger than 4 GB.
 
 * The resulting file (cbe.nt) contains 30+ millions of triples in RDF N-Triples format (this is a quite verbose format, but easier / faster to import)
 
