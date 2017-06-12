@@ -14,4 +14,4 @@ Compressing this file with ZIP, or using RDF HDT, reduces the file size to 200-2
 
 ## Libraries
 
-Uses OpenCSV and Eclipse RDF4J 2.1 snapshot (prior versions don't include ROV / ORG)
+Uses OpenCSV and Eclipse RDF4J 2.2.1.
