@@ -11,6 +11,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+	<rdf4j.version>2.2.4</rdf4j.version>
     </properties>
     <name>cbe-converter</name>
     <dependencies>
@@ -22,12 +23,12 @@
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-ntriples</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${rdf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-model</artifactId>
-            <version>2.1-SNAPSHOT</version>
+            <version>${rdf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -52,7 +53,7 @@
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Main-Class>be.fedict.lodtools.cbe.Main</Main-Class>
+                    <Main-Class>be.fedict.lodtools.cbe.full.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
 		<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
@@ -63,4 +64,5 @@
       </plugin>
     </plugins>
   </build>
+    <version>1.0</version>
 </project>

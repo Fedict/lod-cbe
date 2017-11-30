@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.fedict.lodtools.cbe;
+package be.fedict.lodtools.cbe.full;
 
 import com.google.common.base.Charsets;
 import java.io.BufferedWriter;
@@ -81,17 +81,26 @@ public class Main {
     private static String domain = null;
 	
 	private final static String DOM_BELGIF = "http://org.belgif.be";
-	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/nace2008/";
-	private final static String DOM_PREF_NACE3 = "http://vocab.belgif.be/nace2003/";
-	
+	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/auth/nace2008/";
+	private final static String DOM_PREF_NACE3 = "http://vocab.belgif.be/auth/nace2003/";
+	private final static String DOM_PREF_TYPE = "http://vocab.belgif.be/auth/orgtype/";
 	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
 	
     private final static String PREFIX_ORG = "/cbe/org/";
     private final static String PREFIX_REG = "/cbe/registration/";
     private final static String PREFIX_SITE = "/cbe/site/";
-	private final static String PREFIX_TYPE = "/cbe/type";
-    
+	
 	private final static String SUFFIX_ID = "#id";
+	
+	/**
+	 * Make unique ID for an organization or site
+	 * 
+	 * @param cbe CBE number as string
+	 * @return IRI
+	 */
+	private static IRI makeID(String cbe) {
+		return makeID(cbe.startsWith("0") ? PREFIX_ORG : PREFIX_SITE, cbe);
+	}
 	
     /**
 	 * Make unique ID for an organization or site
@@ -117,7 +126,18 @@ public class Main {
 		return F.createIRI(new StringBuilder(DOM_PREF_OC)
 							.append(cbe.replaceAll("\\.", "")).toString());
 	}
-	
+
+	/**
+	 * Make organization type
+	 * 
+	 * @param cbe CBE number as string
+	 * @return IRI
+	 */
+	private static IRI makeOrgtype(String cbe) {
+		return F.createIRI(new StringBuilder(DOM_PREF_TYPE)
+									.append("CBE").append(cbe).toString());
+	}
+		
 	/**
 	 * Make NACEbel ID
 	 * 
@@ -193,26 +213,23 @@ public class Main {
         return F.createIRI("mailto:" + s);
     }
     
-    /*
-    private final static Function<String[],Iterable<Statement>> orgSites = row -> {
-        List<Statement> arr = new ArrayList<>();
-        
-        IRI subj = companyID(row[0]);
-        IRI reg = companyReg(row[0]);
-        Date date = asDate(row[5]);
-        arr.add(f.createStatement(subj, RDF.TYPE, ROV_ROG));
-        arr.add(f.createStatement(reg, RDF.TYPE, ROV_REG));
-        arr.add(f.createStatement(reg, DCTERMS.ISSUED, f.createLiteral(date)));
-        
-        return arr;
-    };
-    */
-    
+	/**
+	 * Generate stream of addresses
+	 */
+	private final static Function<String[],Stream<Statement>> Addresses = row -> {
+		IRI subj = makeID(row[0]);
+		
+		Stream.Builder<Statement> s = Stream.builder();
+    //    s.add(F.createStatement(subj, ORG.
+		
+		return s.build();
+	};
+
     /**
      * Generate stream of organization name triples
      */
     private final static Function<String[],Stream<Statement>> Names = row -> {
-        IRI subj = makeID(row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE, row[0]);
+        IRI subj = makeID(row[0]);
         String lang = "";
         switch(row[1]) {
             case "1": lang = "fr"; break;
@@ -241,7 +258,7 @@ public class Main {
     private final static Function<String[],Stream<Statement>> Org = row -> {
         IRI subj = makeID(PREFIX_ORG, row[0]);
         IRI reg = makeID(PREFIX_REG, row[0]);
-		IRI type = makeID(PREFIX_TYPE, row[4]);
+		IRI type = makeOrgtype(row[4]);
         Date date = asDate(row[5]);
         
         Stream.Builder<Statement> s = Stream.builder();
@@ -269,11 +286,25 @@ public class Main {
         return s.build();
     };
     
+	/**
+	 * Generate stream of codes
+	 */
+	private final static Function<String[],Stream<Statement>> Codes = row -> {
+		Stream.Builder<Statement> s = Stream.builder();
+		if (row[0].equals("JuridicalForm")) {
+			IRI subj = makeOrgtype(row[1]);
+			Literal label = F.createLiteral(row[3], row[2].toLowerCase());
+			s.add(F.createStatement(subj, RDF.TYPE, SKOS.CONCEPT));
+			s.add(F.createStatement(subj, SKOS.PREF_LABEL, label));
+		}
+		return s.build();
+	};
+	
     /**
      * Generate stream of contacts
      */
     private final static Function<String[],Stream<Statement>> Contacts = row -> {
-        IRI subj = makeID(row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE, row[0]);
+        IRI subj = makeID(row[0]);
         IRI type = null;
         IRI contact = null;
         
@@ -292,8 +323,8 @@ public class Main {
      * Generate stream of activities
      */
     private final static Function<String[],Stream<Statement>> Activities = row -> {
-        IRI subj = makeID(row[0].startsWith("0") ? PREFIX_ORG : PREFIX_SITE, row[0]);
-        return Stream.of(F.createStatement(subj, ROV.ORG_ACTIVITY, makeNACE(row[3], row[2])));
+        return Stream.of(F.createStatement(makeID(row[0]), 
+									ROV.ORG_ACTIVITY, makeNACE(row[3], row[2])));
     };
    
     /**
@@ -305,6 +336,7 @@ public class Main {
         put("establishment.csv", Sites);
         put("contact.csv", Contacts);
         put("activity.csv", Activities);
+		put("address.csv", Addresses);
     }};
             
     /**
@@ -341,6 +373,7 @@ public class Main {
         
         File base = new File(args[0]);
         File outf = new File(args[1], "cbe.nt");
+		File outt = new File(args[1], "cbetypes.nt");
         
         if (args.length > 2 && args[2].startsWith("http")) {
             domain = args[2];
@@ -351,15 +384,31 @@ public class Main {
         LOG.info("--- START ---");
 		LOG.info("Params in = {}, out = {}, domain = {}", base, outf, domain);
 		
+		// companies / organizations
         try (	FileOutputStream fout = new FileOutputStream(outf);
-				BufferedWriter w = new BufferedWriter(new OutputStreamWriter(fout, Charsets.UTF_8))){
+				BufferedWriter w = new BufferedWriter(
+								new OutputStreamWriter(fout, Charsets.UTF_8))){
             RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
             rdf.startRDF();
+			
             for(String file: MAP.keySet()) {
 				LOG.info("Reading CSV file {}", file);
 				InputStream fin = new FileInputStream(new File(base, file));
                 add(rdf, new InputStreamReader(fin, Charsets.UTF_8), MAP.get(file));
             }
+			
+            rdf.endRDF();
+        }
+		
+		// organization types
+		try (	FileOutputStream fout = new FileOutputStream(outt);
+				BufferedWriter w = new BufferedWriter(new OutputStreamWriter(fout, Charsets.UTF_8))){
+            RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
+            rdf.startRDF();
+            String file = "code.csv";
+			LOG.info("Reading CSV file {}", file);
+			InputStream fin = new FileInputStream(new File(base, file));
+            add(rdf, new InputStreamReader(fin, Charsets.UTF_8), Codes);
             rdf.endRDF();
         }
 		LOG.info("--- END ---");
