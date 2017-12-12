@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -212,7 +213,62 @@ public class Main {
 		s = s.replaceFirst("<", "").replaceFirst(">", "");
         return F.createIRI("mailto:" + s);
     }
-    
+
+	/**
+     * Generate organization names to delete
+     */
+    private final static Function<String[],String> Names_del = row -> {
+		return makeID(row[0]).toString();
+    };
+
+	/**
+     * Generate registration records to  delete
+     */
+    private final static Function<String[],String> Org_del = row -> {
+        return makeID(PREFIX_ORG, row[0]).toString();
+	};
+
+	/**
+     * Generate site ID to delete
+     */	
+	private final static Function<String[],String> Sites_del = row -> {
+		return makeID(PREFIX_SITE, row[0]).toString();
+	};
+
+	/**
+     * Generate contact ID to delete
+     */
+    private final static Function<String[],String> Contacts_del = row -> {
+		return makeID(row[0]).toString();
+	};
+			
+	/**
+     * Generate activity ID to delet
+     */
+    private final static Function<String[],String> Activities_del = row -> {
+        return makeID(row[0]).toString();
+    };
+
+	/**
+	 * Generate addresses
+	 */
+	private final static Function<String[],String> Addresses_del = row -> {
+		return makeID(row[0]).toString();
+	};
+	
+	/**
+     * Map files to the functions generating RDF triples.
+     */
+    private final static HashMap<String,Function> MAP_DEL = new HashMap<String,Function>(){{
+        put("enterprise_delete.csv", Org_del);
+        put("denomination_delete.csv", Names_del);
+        put("establishment_delete.csv", Sites_del);
+        put("contact_delete.csv", Contacts_del);
+        put("activity_delete.csv", Activities_del);
+		put("address_delete.csv", Addresses_del);
+    }};
+       
+
 	/**
 	 * Generate stream of addresses
 	 */
@@ -330,7 +386,7 @@ public class Main {
     /**
      * Map files to the functions generating RDF triples.
      */
-    private final static HashMap<String,Function> MAP = new HashMap<String,Function>(){{
+    private final static HashMap<String,Function> MAP_INS = new HashMap<String,Function>(){{
         put("enterprise_insert.csv", Org);
         put("denomination_insert.csv", Names);
         put("establishment_insert.csv", Sites);
@@ -338,7 +394,8 @@ public class Main {
         put("activity_insert.csv", Activities);
 		put("address_insert.csv", Addresses);
     }};
-            
+ 
+	
     /**
      * Generate RDF triples from CSV file, reading 10000 lines at once
      * 
@@ -359,6 +416,40 @@ public class Main {
         }
     }
     
+	/**
+	 * Write a line + newline to a writer
+	 * 
+	 * @param w writer
+	 * @param line line to be written
+	 */
+	private static void writeLine(BufferedWriter w, String line) {
+		try {
+			w.write(line);
+			w.newLine();
+		} catch (IOException ioe) {
+			LOG.error("Error writing to file");
+		}
+	}
+	
+	/**
+	 * Add a line (typically an ID) to a file
+	 * 
+	 * @param w
+	 * @param csv
+	 * @param fun
+	 * @throws IOException 
+	 */
+	private static void add(BufferedWriter w, Reader csv, 
+								Function<String[],String> fun) throws IOException {
+		int lines = 10000;
+
+		try (CsvBulkReader r = new CsvBulkReader(csv)) {
+            while(r.hasNext()) {
+                r.readNext(lines).stream().map(fun).forEach(l -> writeLine(w,l));
+			}
+		}
+	}
+	
     /**
      * Main
      * 
@@ -371,9 +462,9 @@ public class Main {
             System.exit(-1);
         }
         
-        File base = new File(args[0]);
-        File outf = new File(args[1], "cbe.nt");
-        
+        File basedir = new File(args[0]);
+		File outdir = new File(args[1]);
+
         if (args.length > 2 && args[2].startsWith("http")) {
             domain = args[2];
         } else {
@@ -381,19 +472,32 @@ public class Main {
         }
 		
         LOG.info("--- START ---");
-		LOG.info("Params in = {}, out = {}, domain = {}", base, outf, domain);
+		LOG.info("Params in = {}, out = {}, domain = {}", basedir, outdir, domain);
+
+		for(String file: MAP_DEL.keySet()) {
+			File delfile = new File(outdir, file.replaceAll("_delete", "_id"));
+			try (   FileOutputStream fout = new FileOutputStream(delfile);
+					BufferedWriter w = new BufferedWriter(
+								new OutputStreamWriter(fout, Charsets.UTF_8))){
+				LOG.info("Reading CSV file {}, writing {}", file, delfile);
+				InputStream fin = new FileInputStream(new File(basedir, file));
+				add(w, new InputStreamReader(fin, Charsets.UTF_8), MAP_DEL.get(file));
+			} catch (IOException ex) {
+			}
+		}
 		
-		// companies / organizations
+        File outf = new File(args[1], "cbe-upd.nt");		
+		// inserts for companies / organizations
         try (	FileOutputStream fout = new FileOutputStream(outf);
 				BufferedWriter w = new BufferedWriter(
 								new OutputStreamWriter(fout, Charsets.UTF_8))){
             RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
             rdf.startRDF();
 			
-            for(String file: MAP.keySet()) {
+            for(String file: MAP_INS.keySet()) {
 				LOG.info("Reading CSV file {}", file);
-				InputStream fin = new FileInputStream(new File(base, file));
-                add(rdf, new InputStreamReader(fin, Charsets.UTF_8), MAP.get(file));
+				InputStream fin = new FileInputStream(new File(basedir, file));
+                add(rdf, new InputStreamReader(fin, Charsets.UTF_8), MAP_INS.get(file));
             }
 			
             rdf.endRDF();
