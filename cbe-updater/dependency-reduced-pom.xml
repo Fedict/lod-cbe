@@ -24,7 +24,7 @@
               <transformers>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>be.fedict.lodtools.cbeupdater.Main</Main-Class>
+                    <Main-Class>be.fedict.lodtools.cbe.updater.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
                 <transformer />

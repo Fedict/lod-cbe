@@ -64,6 +64,7 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -424,7 +425,7 @@ public class Main {
 	 */
 	private static void writeLine(BufferedWriter w, String line) {
 		try {
-			w.write(line);
+			w.write("<" + line + ">");
 			w.newLine();
 		} catch (IOException ioe) {
 			LOG.error("Error writing to file");
