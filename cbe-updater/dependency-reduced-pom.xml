@@ -8,6 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>cbe-updater</artifactId>
   <name>cbe-updater</name>
+  <version>1.0</version>
   <build>
     <plugins>
       <plugin>
@@ -20,7 +21,6 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <minimizeJar>true</minimizeJar>
               <transformers>
                 <transformer>
                   <manifestEntries>
@@ -32,6 +32,19 @@
             </configuration>
           </execution>
         </executions>
+        <configuration>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
+        </configuration>
       </plugin>
     </plugins>
   </build>

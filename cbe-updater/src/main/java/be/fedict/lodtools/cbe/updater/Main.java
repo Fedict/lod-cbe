@@ -25,7 +25,9 @@
  */
 package be.fedict.lodtools.cbe.updater;
 
+import be.fedict.lodtools.cbe.common.CsvBulkReader;
 import com.google.common.base.Charsets;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +44,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.eclipse.rdf4j.model.IRI;
@@ -192,10 +193,12 @@ public class Main {
 		if (s.length() < 5) {
 			return null;
 		}
-		// correct malformed input
-		s = s.replaceFirst("http:\\\\", "http://");
-		s = s.replaceFirst("http//", "http://"); 
-		s = s.replaceFirst("https//", "https://");
+		// check for malformed input
+		if (s.startsWith("http") || s.startsWith("https")) {
+			if (!(s.startsWith("http://") || s.startsWith("https://"))) {
+				LOG.warn("Incorrect URL {}", s);
+			}
+		}
         return F.createIRI(s.startsWith("http") ? s : "http://" + s);
     }
     

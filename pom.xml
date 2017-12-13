@@ -7,8 +7,8 @@
     <packaging>pom</packaging>
     <modules>
         <module>converter</module>
-        <module>cbe-frontend</module>
         <module>cbe-updater</module>
+        <module>cbe-common</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

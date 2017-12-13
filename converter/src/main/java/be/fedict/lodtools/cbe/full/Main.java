@@ -25,6 +25,7 @@
  */
 package be.fedict.lodtools.cbe.full;
 
+import be.fedict.lodtools.cbe.common.CsvBulkReader;
 import com.google.common.base.Charsets;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -63,6 +64,7 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.RDFWriter;
 import org.eclipse.rdf4j.rio.Rio;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,10 +192,13 @@ public class Main {
 		if (s.length() < 5) {
 			return null;
 		}
-		// correct malformed input
-		s = s.replaceFirst("http:\\\\", "http://");
-		s = s.replaceFirst("http//", "http://"); 
-		s = s.replaceFirst("https//", "https://");
+
+		// check for malformed input
+		if (s.startsWith("http") || s.startsWith("https")) {
+			if (!(s.startsWith("http://") || s.startsWith("https://"))) {
+				LOG.warn("Incorrect URL {}", s);
+			}
+		}
         return F.createIRI(s.startsWith("http") ? s : "http://" + s);
     }
     

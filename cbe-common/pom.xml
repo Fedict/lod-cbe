@@ -6,11 +6,18 @@
         <artifactId>cbe</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>be.belgif.org</groupId>
-    <artifactId>cbe-frontend</artifactId>
+    <artifactId>cbe-common</artifactId>
     <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>4.1</version>
+        </dependency>
+    </dependencies>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    <groupId>be.fedict.lodtools</groupId>
 </project>
