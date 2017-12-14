@@ -89,5 +89,6 @@
 	    </plugin>
 	</plugins>
     </build>
-    <version>1.0</version>
+    <version>1.1</version>
+    <description>Converts incremental CBE update open data download to Linked Open Data</description>
 </project>
