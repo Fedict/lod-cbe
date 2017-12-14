@@ -6,8 +6,10 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
+  <groupId>be.fedict.lodtools</groupId>
   <artifactId>cbe-converter</artifactId>
   <name>cbe-converter</name>
+  <version>1.0</version>
   <build>
     <plugins>
       <plugin>
@@ -24,7 +26,7 @@
               <transformers>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>be.fedict.lodtools.cbe.Main</Main-Class>
+                    <Main-Class>be.fedict.lodtools.cbe.full.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
                 <transformer />
@@ -36,6 +38,7 @@
     </plugins>
   </build>
   <properties>
+    <rdf4j.version>2.2.4</rdf4j.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>

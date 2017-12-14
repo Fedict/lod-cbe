@@ -25,6 +25,7 @@
  */
 package be.fedict.lodtools.cbe.updater;
 
+import be.fedict.lodtools.cbe.common.CBEConverter;
 import be.fedict.lodtools.cbe.common.CsvBulkReader;
 import com.google.common.base.Charsets;
 
@@ -37,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -118,105 +120,7 @@ public class Main {
                             .append(cbe.replaceAll("\\.", "_").replaceAll(" ", "%20"))
                             .append(SUFFIX_ID).toString());
     }
-    
-	/**
-	 * Make OpenCorporates.com ID
-	 * 
-	 * @param cbe CBE number as string
-	 * @return IRI
-	 */
-	private static IRI makeOCID(String cbe) {
-		return F.createIRI(new StringBuilder(DOM_PREF_OC)
-							.append(cbe.replaceAll("\\.", "")).toString());
-	}
-
-	/**
-	 * Make organization type
-	 * 
-	 * @param cbe CBE number as string
-	 * @return IRI
-	 */
-	private static IRI makeOrgtype(String cbe) {
-		return F.createIRI(new StringBuilder(DOM_PREF_TYPE)
-									.append("CBE").append(cbe).toString());
-	}
-		
-	/**
-	 * Make NACEbel ID
-	 * 
-	 * @param code NACEbel code as string
-	 * @param code NACEbel version
-	 * @return IRI
-	 */
-	private static IRI makeNACE(String code, String ver) {
-		String prefix = ver.startsWith("2003") ? DOM_PREF_NACE3 : DOM_PREF_NACE8;
-		return F.createIRI(new StringBuilder(prefix)
-				.append(code).append(SUFFIX_ID).toString());
-	}
-	
-    /**
-     * Convert DD-MM-YYYY date string to date object
-     * 
-     * @param date date string in DD-MM-YYYY format
-     * @return date object
-     */
-    private static Date asDate(String date) {
-        try {
-            return SDF.parse(date);
-        } catch (ParseException ex) {
-            return null;
-        }
-    }
-    
-    /**
-     * Clean and convert phone number to tel: IRI.
-     * By default, the prefix +32 (Belgium) will be added
-     * 
-     * @param phone phone number
-     * @return tel: IRI
-     */
-    private static IRI asPhone(String phone) {
-        String s = phone.replace("(0)", "-")
-                        .replaceAll("[^\\d+]+", "-")
-                        .replaceFirst("^[-0]+", "+32-");
-        return F.createIRI("tel:" + s);
-    }
-    
-    /**
-     * Clean up and convert webpage to http: IRI.
-     * 
-     * @param page web page
-     * @return http: IRI or null
-     */
-    private static IRI asPage(String page) {
-        String s = page.toLowerCase().trim().split(" ", 2)[0];
-		if (s.length() < 5) {
-			return null;
-		}
-		// check for malformed input
-		if (s.startsWith("http") || s.startsWith("https")) {
-			if (!(s.startsWith("http://") || s.startsWith("https://"))) {
-				LOG.warn("Incorrect URL {}", s);
-			}
-		}
-        return F.createIRI(s.startsWith("http") ? s : "http://" + s);
-    }
-    
-    /**
-     * Clean up and convert email address to mailto: IRI.
-     * 
-     * @param mail email address
-     * @return mailto: IRI or null
-     */
-    private static IRI asMail(String mail) {
-        String s = mail.toLowerCase().trim().split(" ", 2)[0];
-		if (s.length() < 7 || !s.contains("@")) {
-			return null;
-		}
-		// correct malformed input
-		s = s.replaceFirst("<", "").replaceFirst(">", "");
-        return F.createIRI("mailto:" + s);
-    }
+  
 
 	/**
      * Generate organization names to delete
@@ -229,14 +133,14 @@ public class Main {
      * Generate registration records to  delete
      */
     private final static Function<String[],String> Org_del = row -> {
-        return makeID(PREFIX_ORG, row[0]).toString();
+        return CBEConverter.makeID(PREFIX_ORG, row[0]).toString();
 	};
 
 	/**
      * Generate site ID to delete
      */	
 	private final static Function<String[],String> Sites_del = row -> {
-		return makeID(PREFIX_SITE, row[0]).toString();
+		return CBEConverter.makeID(PREFIX_SITE, row[0]).toString();
 	};
 
 	/**
@@ -271,132 +175,17 @@ public class Main {
         put("activity_delete.csv", Activities_del);
 		put("address_delete.csv", Addresses_del);
     }};
-       
-
-	/**
-	 * Generate stream of addresses
-	 */
-	private final static Function<String[],Stream<Statement>> Addresses = row -> {
-		IRI subj = makeID(row[0]);
-		
-		Stream.Builder<Statement> s = Stream.builder();
-    //    s.add(F.createStatement(subj, ORG.
-		
-		return s.build();
-	};
-
-    /**
-     * Generate stream of organization name triples
-     */
-    private final static Function<String[],Stream<Statement>> Names = row -> {
-        IRI subj = makeID(row[0]);
-        String lang = "";
-        switch(row[1]) {
-            case "1": lang = "fr"; break;
-            case "2": lang = "nl"; break;
-            case "3": lang = "de"; break;
-            case "4": lang = "en"; break;
-        }
-        IRI pred = row[2].equals("001") ? ROV.LEGAL_NAME : SKOS.ALT_LABEL;
-		Literal lit = (!lang.isEmpty()) ? F.createLiteral(row[3], lang)
-										: F.createLiteral(row[3]);
-		Stream.Builder<Statement> s = Stream.builder();
-        s.add(F.createStatement(subj, pred, lit));
-		
-		// Add label for query / display purposes
-		if (pred.equals(ROV.LEGAL_NAME) ||
-				(row[0].startsWith("2") && pred.equals(SKOS.ALT_LABEL))) {
-			s.add(F.createStatement(subj, RDFS.LABEL, lit));
-		}
-		
-        return s.build();
-    };
-    
-    /**
-     * Generate stream of registration records 
-     */
-    private final static Function<String[],Stream<Statement>> Org = row -> {
-        IRI subj = makeID(PREFIX_ORG, row[0]);
-        IRI reg = makeID(PREFIX_REG, row[0]);
-		IRI type = makeOrgtype(row[4]);
-        Date date = asDate(row[5]);
-        
-        Stream.Builder<Statement> s = Stream.builder();
-        s.add(F.createStatement(subj, RDF.TYPE, ROV.REGISTERED_ORGANIZATION))
-            .add(F.createStatement(subj, ROV.REGISTRATION, reg))
-			.add(F.createStatement(subj, ROV.ORG_TYPE, type))
-			.add(F.createStatement(subj, OWL.SAMEAS, makeOCID(row[0])))
-            .add(F.createStatement(reg, DCTERMS.ISSUED, F.createLiteral(date)));
-        return s.build();
-    };
-    
-    /**
-     * Generate stream of organization name triples
-     */
-    private final static Function<String[],Stream<Statement>> Sites = row -> {
-        IRI site = makeID(PREFIX_SITE, row[0]);
-        Date date = asDate(row[1]);
-        IRI org = makeID(PREFIX_ORG, row[2]);
-        
-        Stream.Builder<Statement> s = Stream.builder();
-        s.add(F.createStatement(site, RDF.TYPE, ORG.SITE))
-            .add(F.createStatement(org, ORG.HAS_SITE, site))
-            .add(F.createStatement(site, ORG.SITE_OF, org))
-            .add(F.createStatement(site, DCTERMS.ISSUED, F.createLiteral(date)));
-        return s.build();
-    };
-    
-	/**
-	 * Generate stream of codes
-	 */
-	private final static Function<String[],Stream<Statement>> Codes = row -> {
-		Stream.Builder<Statement> s = Stream.builder();
-		if (row[0].equals("JuridicalForm")) {
-			IRI subj = makeOrgtype(row[1]);
-			Literal label = F.createLiteral(row[3], row[2].toLowerCase());
-			s.add(F.createStatement(subj, RDF.TYPE, SKOS.CONCEPT));
-			s.add(F.createStatement(subj, SKOS.PREF_LABEL, label));
-		}
-		return s.build();
-	};
-	
-    /**
-     * Generate stream of contacts
-     */
-    private final static Function<String[],Stream<Statement>> Contacts = row -> {
-        IRI subj = makeID(row[0]);
-        IRI type = null;
-        IRI contact = null;
-        
-        switch(row[2]) {
-            case "TEL": type = FOAF.PHONE; contact = asPhone(row[3]); break;
-            case "WEB": type = FOAF.HOMEPAGE; contact = asPage(row[3]); break;
-            case "EMAIL": type = FOAF.MBOX; contact = asMail(row[3]); break;
-        }
-		if (contact == null) {
-			return Stream.empty();
-		}
-		return Stream.of(F.createStatement(subj, type, contact));
-	};
-   
-    /**
-     * Generate stream of activities
-     */
-    private final static Function<String[],Stream<Statement>> Activities = row -> {
-        return Stream.of(F.createStatement(makeID(row[0]), 
-									ROV.ORG_ACTIVITY, makeNACE(row[3], row[2])));
-    };
-   
+ 
     /**
      * Map files to the functions generating RDF triples.
      */
     private final static HashMap<String,Function> MAP_INS = new HashMap<String,Function>(){{
-        put("enterprise_insert.csv", Org);
-        put("denomination_insert.csv", Names);
-        put("establishment_insert.csv", Sites);
-        put("contact_insert.csv", Contacts);
-        put("activity_insert.csv", Activities);
-		put("address_insert.csv", Addresses);
+        put("enterprise_insert.csv", CBEConverter.Org);
+        put("denomination_insert.csv", CBEConverter.Names);
+        put("establishment_insert.csv", CBEConverter.Sites);
+        put("contact_insert.csv", CBEConverter.Contacts);
+        put("activity_insert.csv", CBEConverter.Activities);
+		put("address_insert.csv", CBEConverter.Addresses);
     }};
  
 	
@@ -462,21 +251,15 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         if (args.length < 2) {
-            System.out.println("Usage: cbe <input_dir> <output_dir> [IRI_domain]");
+            System.out.println("Usage: cbe <input_dir> <output_dir>");
             System.exit(-1);
         }
         
         File basedir = new File(args[0]);
 		File outdir = new File(args[1]);
-
-        if (args.length > 2 && args[2].startsWith("http")) {
-            domain = args[2];
-        } else {
-            domain = DOM_BELGIF;
-        }
 		
         LOG.info("--- START ---");
-		LOG.info("Params in = {}, out = {}, domain = {}", basedir, outdir, domain);
+		LOG.info("Params in = {}, out = {}", basedir, outdir);
 
 		for(String file: MAP_DEL.keySet()) {
 			File delfile = new File(outdir, file.replaceAll("_delete", "_id"));
@@ -485,7 +268,7 @@ public class Main {
 								new OutputStreamWriter(fout, Charsets.UTF_8))){
 				LOG.info("Reading CSV file {}, writing {}", file, delfile);
 				InputStream fin = new FileInputStream(new File(basedir, file));
-				add(w, new InputStreamReader(fin, Charsets.UTF_8), MAP_DEL.get(file));
+				add(w, new InputStreamReader(fin, StandardCharsets.UTF_8), MAP_DEL.get(file));
 			} catch (IOException ex) {
 			}
 		}
@@ -494,7 +277,7 @@ public class Main {
 		// inserts for companies / organizations
         try (	FileOutputStream fout = new FileOutputStream(outf);
 				BufferedWriter w = new BufferedWriter(
-								new OutputStreamWriter(fout, Charsets.UTF_8))){
+								new OutputStreamWriter(fout, StandardCharsets.UTF_8))){
             RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
             rdf.startRDF();
 			
