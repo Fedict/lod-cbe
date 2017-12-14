@@ -40,29 +40,12 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.eclipse.rdf4j.model.IRI;
-import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
-
-import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
-import org.eclipse.rdf4j.model.vocabulary.FOAF;
-import org.eclipse.rdf4j.model.vocabulary.RDF;
-import org.eclipse.rdf4j.model.vocabulary.ORG;
-import org.eclipse.rdf4j.model.vocabulary.OWL;
-import org.eclipse.rdf4j.model.vocabulary.RDFS;
-import org.eclipse.rdf4j.model.vocabulary.ROV;
-import org.eclipse.rdf4j.model.vocabulary.SKOS;
-
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.RDFHandler;
 import org.eclipse.rdf4j.rio.RDFWriter;
@@ -78,55 +61,17 @@ import org.slf4j.LoggerFactory;
  */
 public class Main {
 	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
- 
-    private final static ValueFactory F = SimpleValueFactory.getInstance();
-
-    private final static SimpleDateFormat SDF = new SimpleDateFormat("dd-MM-yyyy");
-    
-    private static String domain = null;
-	
-	private final static String DOM_BELGIF = "http://org.belgif.be";
-	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/auth/nace2008/";
-	private final static String DOM_PREF_NACE3 = "http://vocab.belgif.be/auth/nace2003/";
-	private final static String DOM_PREF_TYPE = "http://vocab.belgif.be/auth/orgtype/";
-	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
-	
+ 	
     private final static String PREFIX_ORG = "/cbe/org/";
     private final static String PREFIX_REG = "/cbe/registration/";
     private final static String PREFIX_SITE = "/cbe/site/";
-	
-	private final static String SUFFIX_ID = "#id";
-	
-	/**
-	 * Make unique ID for an organization or site
-	 * 
-	 * @param cbe CBE number as string
-	 * @return IRI
-	 */
-	private static IRI makeID(String cbe) {
-		return makeID(cbe.startsWith("0") ? PREFIX_ORG : PREFIX_SITE, cbe);
-	}
-	
-    /**
-	 * Make unique ID for an organization or site
-	 * 
-	 * @param type organization or site
-	 * @param cbe CBE number as string
-	 * @return IRI
-	 */
-    private static IRI makeID(String type, String cbe) {
-        return F.createIRI(new StringBuilder(domain)
-                            .append(type)
-                            .append(cbe.replaceAll("\\.", "_").replaceAll(" ", "%20"))
-                            .append(SUFFIX_ID).toString());
-    }
-  
+
 
 	/**
      * Generate organization names to delete
      */
     private final static Function<String[],String> Names_del = row -> {
-		return makeID(row[0]).toString();
+		return CBEConverter.makeID(row[0]).toString();
     };
 
 	/**
@@ -147,21 +92,21 @@ public class Main {
      * Generate contact ID to delete
      */
     private final static Function<String[],String> Contacts_del = row -> {
-		return makeID(row[0]).toString();
+		return CBEConverter.makeID(row[0]).toString();
 	};
 			
 	/**
      * Generate activity ID to delet
      */
     private final static Function<String[],String> Activities_del = row -> {
-        return makeID(row[0]).toString();
+        return CBEConverter.makeID(row[0]).toString();
     };
 
 	/**
 	 * Generate addresses
 	 */
 	private final static Function<String[],String> Addresses_del = row -> {
-		return makeID(row[0]).toString();
+		return CBEConverter.makeID(row[0]).toString();
 	};
 	
 	/**
