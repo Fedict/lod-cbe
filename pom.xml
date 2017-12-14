@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.fedict.lodtools</groupId>
     <artifactId>cbe</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1</version>
     <packaging>pom</packaging>
     <modules>
         <module>converter</module>
@@ -13,4 +13,5 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+    <description>CBE tools</description>
 </project>
