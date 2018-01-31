@@ -7,9 +7,14 @@
 ## KBO Open Data
 
 - Full and incremental updates available
-  - Updated every month
   - (free) registration required
 - Only contains active organizations
+
+---
+
+## Features
+
+- Uses W3C [Registered Organization](https://www.w3.org/TR/vocab-regorg/)
 
 ---
 
