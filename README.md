@@ -3,7 +3,32 @@
 Java 8 command line tools to convert CSV dump of the KBO/BCE 
 (the official company register in Belgium) to RDF.
 
-## Converting full CBE to RDF
+
+Based upon the [open data CSV files](https://kbopub.economie.fgov.be/kbo-open-data/login?lang=en) 
+and the [Excel file](http://statbel.fgov.be/nl/statistieken/gegevensinzameling/nomenclaturen/nacebel/) 
+published by the FPS Economy.
+
+## CBE as linked data
+
+Examples:
+
+```
+http://org.belgif.be/cbe/org/0367_302_178#id  (Fedict)
+http://org.belgif.be/cbe/_search?q=fed (Search for names starting with "Fed")
+http://org.belgif.be/cbe/_filter?nace=nace2008/84119 (organizations per Nace2008 code)
+```
+
+### Content-negotiation
+
+An HTTP client can ask for various  RDF 1.1 serializations, by setting the HTTP `Accept` header.
+All requests are HTTP GET request.
+
+  * `application/ld+json`: JSON-LD
+  * `text/turtle`: Turtle
+  * `application/n-triples`: N-Triples
+
+
+## Converting full CBE to RDF linked data
 
 * Register (for free) on the CBE website using the [registration form](http://kbopub.economie.fgov.be/kbo-open-data/signup?lang=en&form).   Despite the "\*" on the form next to the company field, having a company number is not required for obtaining a login.
 
@@ -27,7 +52,7 @@ Make sure your OS / filesystem supports files larger than 4 GB.
 * The resulting file (cbe.nt) contains 30+ millions of triples in RDF N-Triples 
 format (this is a quite verbose format, but easier / faster to import).
 
-## Generating RDF from monthly update files
+### Generating RDF from monthly update files
 
 * Download the ZIP file containing the monthly updates. 
 
