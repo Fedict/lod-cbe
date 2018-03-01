@@ -53,96 +53,98 @@ import org.eclipse.rdf4j.rio.Rio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Convert open data CBE (Belgian company register) to RDF Triples.
- * 
+ *
  * @author Bart Hanssens <bart.hanssens@fedict.be>
  */
 public class Main {
+
 	private final static Logger LOG = LoggerFactory.getLogger(Main.class);
-	
-    private static String domain = null;
-	
-    /**
-     * Map files to the functions generating RDF triples.
-     */
-    private final static HashMap<String,Function> MAP = new HashMap<String,Function>(){{
-        put("enterprise.csv", CBEConverter.Org);
-        put("denomination.csv", CBEConverter.Names);
-        put("establishment.csv", CBEConverter.Sites);
-        put("contact.csv", CBEConverter.Contacts);
-        put("activity.csv", CBEConverter.Activities);
-		put("address.csv", CBEConverter.Addresses);
-    }};
-            
-    /**
-     * Generate RDF triples from CSV file, reading 10000 lines at once
-     * 
-     * @param rdf RDF writer
-     * @param csv CSV containing data
-     * @param fun function generating RDF triples
-     * @throws IOException 
-     */
-    private static void add(RDFHandler rdf, Reader csv, 
-                            Function<String[],Stream<Statement>> fun) throws IOException {
-        int lines = 10000;
-  
-        try (CsvBulkReader r = new CsvBulkReader(csv)) {
-            while(r.hasNext()) {
-                r.readNext(lines).stream().flatMap(fun).forEach(rdf::handleStatement);
+
+	private static String domain = null;
+
+	/**
+	 * Map files to the functions generating RDF triples.
+	 */
+	private final static HashMap<String, Function> MAP = new HashMap<String, Function>() {
+		{
+			put("enterprise.csv", CBEConverter.Org);
+			put("denomination.csv", CBEConverter.Names);
+			put("establishment.csv", CBEConverter.Sites);
+			put("contact.csv", CBEConverter.Contacts);
+			put("activity.csv", CBEConverter.Activities);
+			put("address.csv", CBEConverter.Addresses);
+		}
+	};
+
+	/**
+	 * Generate RDF triples from CSV file, reading 10000 lines at once
+	 *
+	 * @param rdf RDF writer
+	 * @param csv CSV containing data
+	 * @param fun function generating RDF triples
+	 * @throws IOException
+	 */
+	private static void add(RDFHandler rdf, Reader csv,
+		Function<String[], Stream<Statement>> fun) throws IOException {
+		int lines = 10000;
+
+		try (CsvBulkReader r = new CsvBulkReader(csv)) {
+			while (r.hasNext()) {
+				r.readNext(lines).stream().flatMap(fun).forEach(rdf::handleStatement);
 				LOG.debug("Reading lines");
-            }
-        }
-    }
-    
-    /**
-     * Main
-     * 
-     * @param args
-     * @throws IOException 
-     */
-    public static void main(String[] args) throws IOException {
-        if (args.length < 2) {
-            System.out.println("Usage: cbe <input_dir> <output_dir>");
-            System.exit(-1);
-        }
-        
-        File base = new File(args[0]);
-        File outf = new File(args[1], "cbe.nt");
+			}
+		}
+	}
+
+	/**
+	 * Main
+	 *
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+		if (args.length < 2) {
+			System.out.println("Usage: cbe <input_dir> <output_dir>");
+			System.exit(-1);
+		}
+
+		File base = new File(args[0]);
+		File outf = new File(args[1], "cbe.nt");
 		File outt = new File(args[1], "cbetypes.nt");
-		
-        LOG.info("--- START ---");
+
+		LOG.info("--- START ---");
 		LOG.info("Params in = {}, out = {}", base);
-		
+
 		// companies / organizations
-        try (	FileOutputStream fout = new FileOutputStream(outf);
-				BufferedWriter w = new BufferedWriter(
-								new OutputStreamWriter(fout, StandardCharsets.UTF_8))){
-            RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
-            rdf.startRDF();
-			
-            for(String file: MAP.keySet()) {
+		try (FileOutputStream fout = new FileOutputStream(outf);
+			BufferedWriter w = new BufferedWriter(
+				new OutputStreamWriter(fout, StandardCharsets.UTF_8))) {
+			RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
+			rdf.startRDF();
+
+			for (String file : MAP.keySet()) {
 				LOG.info("Reading CSV file {}", file);
 				InputStream fin = new FileInputStream(new File(base, file));
-                add(rdf, new InputStreamReader(fin, StandardCharsets.UTF_8), MAP.get(file));
-            }
-			
-            rdf.endRDF();
-        }
-		
+				add(rdf, new InputStreamReader(fin, StandardCharsets.UTF_8), MAP.get(file));
+			}
+
+			rdf.endRDF();
+		}
+
 		// organization types
-		try (	FileOutputStream fout = new FileOutputStream(outt);
-				BufferedWriter w = new BufferedWriter(
-						new OutputStreamWriter(fout, StandardCharsets.UTF_8))){
-            RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
-            rdf.startRDF();
-            String file = "code.csv";
+		try (FileOutputStream fout = new FileOutputStream(outt);
+			BufferedWriter w = new BufferedWriter(
+				new OutputStreamWriter(fout, StandardCharsets.UTF_8))) {
+			RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
+			rdf.startRDF();
+			String file = "code.csv";
 			LOG.info("Reading CSV file {}", file);
 			InputStream fin = new FileInputStream(new File(base, file));
-            add(rdf, new InputStreamReader(fin, StandardCharsets.UTF_8), CBEConverter.Codes);
-            rdf.endRDF();
-        }
+			add(rdf, new InputStreamReader(fin, StandardCharsets.UTF_8), CBEConverter.Codes);
+			rdf.endRDF();
+		}
 		LOG.info("--- END ---");
-    }
+	}
 }

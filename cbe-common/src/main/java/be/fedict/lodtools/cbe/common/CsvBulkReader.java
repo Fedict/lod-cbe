@@ -34,46 +34,47 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Small helper class. 
- * 
+ * Small helper class.
+ *
  * @author Bart Hanssens <bart.hanssens@fedict.be>
  */
 public class CsvBulkReader extends CSVReader {
-    private final Iterator<String[]> iter;
-    
-    /**
-     * Check if there are more rows
-     * 
-     * @return true if there are more rows 
-     */
-    public boolean hasNext() {
-        return iter.hasNext();
-    }
-    
-    /**
-     * Reads a number of lines. 
-     * 
-     * @param lines maximum number of lines to be read
-     * @return list of string arrays
-     */
-    public List<String[]> readNext(int lines) {
-        List<String[]> arr = new ArrayList<>();
-        
-        int nr = 0;
-        while(iter.hasNext() && nr < lines) {
-            arr.add(iter.next());
-            nr++;
-        }
-        return arr;
-    }
-    
-    /**
-     * Constructor 
-     * 
-     * @param reader 
-     */
-    public CsvBulkReader(Reader reader) {
-        super(reader, ',', '"', 1);
-        iter = this.iterator();
-    }
+
+	private final Iterator<String[]> iter;
+
+	/**
+	 * Check if there are more rows
+	 *
+	 * @return true if there are more rows
+	 */
+	public boolean hasNext() {
+		return iter.hasNext();
+	}
+
+	/**
+	 * Reads a number of lines.
+	 *
+	 * @param lines maximum number of lines to be read
+	 * @return list of string arrays
+	 */
+	public List<String[]> readNext(int lines) {
+		List<String[]> arr = new ArrayList<>();
+
+		int nr = 0;
+		while (iter.hasNext() && nr < lines) {
+			arr.add(iter.next());
+			nr++;
+		}
+		return arr;
+	}
+
+	/**
+	 * Constructor
+	 *
+	 * @param reader
+	 */
+	public CsvBulkReader(Reader reader) {
+		super(reader, ',', '"', 1);
+		iter = this.iterator();
+	}
 }
