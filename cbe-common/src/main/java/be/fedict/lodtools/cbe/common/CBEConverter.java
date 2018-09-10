@@ -196,9 +196,18 @@ public class CBEConverter {
 		if (s.startsWith("http") || s.startsWith("https")) {
 			if (!(s.startsWith("http://") || s.startsWith("https://"))) {
 				LOG.warn("Incorrect URL {}", s);
+				return null;
 			}
+		} else if (s.startsWith("www:")) {
+			LOG.warn("Incorrect URL {}", s);
+			return null;
 		}
-		return F.createIRI(s.startsWith("http") ? s : "http://" + s);
+		try { 
+			return F.createIRI(s.startsWith("http") ? s : "http://" + s);
+		} catch (IllegalArgumentException iae) {
+			LOG.warn("Incorrect URL {}", s);
+			return null;
+		}
 	}
 
 	/**
