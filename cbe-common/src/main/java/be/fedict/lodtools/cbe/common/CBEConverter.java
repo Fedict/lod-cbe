@@ -69,11 +69,9 @@ public class CBEConverter {
 	private final static String DOM_PREF_TYPE = "http://vocab.belgif.be/auth/orgtype/";
 	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
 
-	private final static String PREFIX_ORG = "/cbe/org/";
-	private final static String PREFIX_REG = "/cbe/registration/";
-	private final static String PREFIX_SITE = "/cbe/site/";
-
-	private final static String SUFFIX_ID = "#id";
+	private final static String PREFIX_ORG = "/id/cbe/org/";
+	private final static String PREFIX_REG = "/id/cbe/registration/";
+	private final static String PREFIX_SITE = "/id/cbe/site/";
 
 	/**
 	 * Make unique ID for an organization or site
@@ -96,7 +94,7 @@ public class CBEConverter {
 		return F.createIRI(new StringBuilder(ORG_BELGIF)
 			.append(type)
 			.append(cbe.replaceAll("\\.", "_").replaceAll(" ", "%20"))
-			.append(SUFFIX_ID).toString());
+			.toString());
 	}
 
 	/**
@@ -139,7 +137,7 @@ public class CBEConverter {
 		}
 		String prefix = ver.startsWith("2003") ? DOM_PREF_NACE3 : DOM_PREF_NACE8;
 		return F.createIRI(new StringBuilder(prefix)
-			.append(code.trim()).append(SUFFIX_ID).toString());
+			.append(code.trim()).toString());
 	}
 
 	/**

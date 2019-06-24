@@ -28,8 +28,6 @@ package be.fedict.lodtools.cbe.updater;
 import be.fedict.lodtools.cbe.common.CBEConverter;
 import be.fedict.lodtools.cbe.common.CsvBulkReader;
 
-import com.google.common.base.Charsets;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -213,7 +211,7 @@ public class Main {
 			File delfile = new File(outdir, file.replaceAll("_delete", "_id"));
 			try (FileOutputStream fout = new FileOutputStream(delfile);
 				BufferedWriter w = new BufferedWriter(
-					new OutputStreamWriter(fout, Charsets.UTF_8))) {
+					new OutputStreamWriter(fout, StandardCharsets.UTF_8))) {
 				LOG.info("Reading CSV file {}, writing {}", file, delfile);
 				InputStream fin = new FileInputStream(new File(basedir, file));
 				add(w, new InputStreamReader(fin, StandardCharsets.UTF_8), MAP_DEL.get(file));
@@ -232,7 +230,7 @@ public class Main {
 			for (String file : MAP_INS.keySet()) {
 				LOG.info("Reading CSV file {}", file);
 				InputStream fin = new FileInputStream(new File(basedir, file));
-				add(rdf, new InputStreamReader(fin, Charsets.UTF_8), MAP_INS.get(file));
+				add(rdf, new InputStreamReader(fin, StandardCharsets.UTF_8), MAP_INS.get(file));
 			}
 
 			rdf.endRDF();
