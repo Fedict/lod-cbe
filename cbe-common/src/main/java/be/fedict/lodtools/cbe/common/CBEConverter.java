@@ -40,6 +40,7 @@ import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.FOAF;
+import org.eclipse.rdf4j.model.vocabulary.LOCN;
 import org.eclipse.rdf4j.model.vocabulary.ORG;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
@@ -63,6 +64,7 @@ public class CBEConverter {
 	private final static SimpleDateFormat SDF = new SimpleDateFormat("dd-MM-yyyy");
 
 	public final static String ORG_BELGIF = "http://org.belgif.be";
+	
 
 	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/auth/nace2008/";
 	private final static String DOM_PREF_NACE3 = "http://vocab.belgif.be/auth/nace2003/";
@@ -72,6 +74,7 @@ public class CBEConverter {
 	private final static String PREFIX_ORG = "/id/cbe/org/";
 	private final static String PREFIX_REG = "/id/cbe/registration/";
 	private final static String PREFIX_SITE = "/id/cbe/site/";
+	private final static String PREFIX_ADDR = "/id/cbe/addr/";
 
 	/**
 	 * Make unique ID for an organization or site
@@ -97,6 +100,23 @@ public class CBEConverter {
 			.toString());
 	}
 
+	/**
+	 * Make unique ID for address from address parts
+	 * 
+	 * @param parts zipcode, street name, number... 
+	 * @return IRI
+	 */
+	public static IRI makeAddress(String... parts) {
+		StringBuilder s = new StringBuilder(ORG_BELGIF).append(PREFIX_ADDR);
+		String prefPart = "";
+		for (String part: parts) {
+			if (part != null && !part.isEmpty() && !part.equals(prefPart)) {
+				s.append(part.replaceAll("\\W", "_"));
+			}
+		}
+		return F.createIRI(s.toString());
+	}
+	
 	/**
 	 * Make OpenCorporates.com ID
 	 *
@@ -231,18 +251,6 @@ public class CBEConverter {
 	}
 
 	/**
-	 * Generate stream of addresses
-	 */
-	public final static Function<String[], Stream<Statement>> Addresses = row -> {
-		IRI subj = makeID(row[0]);
-
-		Stream.Builder<Statement> s = Stream.builder();
-		//    s.add(F.createStatement(subj, ORG.
-
-		return s.build();
-	};
-
-	/**
 	 * Generate stream of organization name triples
 	 */
 	public final static Function<String[], Stream<Statement>> Names = row -> {
@@ -356,6 +364,43 @@ public class CBEConverter {
 		return Stream.of(F.createStatement(subj, type, contact));
 	};
 
+	/**
+	 * Generate stream of addresses
+	 */
+	public final static Function<String[], Stream<Statement>> Addresses = row -> {
+		Stream.Builder<Statement> s = Stream.builder();
+		
+		IRI subj = makeID(row[0]);
+		IRI addr = makeAddress(row[2], row[3], row[4], row[7], row[8], row[9], row[10]);
+		s.add(F.createStatement(subj, LOCN.ADDRESS_PROP, addr));
+		s.add(F.createStatement(addr, RDF.TYPE, LOCN.ADDRESS));
+		s.add(F.createStatement(addr, LOCN.ADMIN_UNIT_L1, 
+			F.createLiteral(row[2].isEmpty() ? "België" : row[2], "nl")));
+		s.add(F.createStatement(addr, LOCN.ADMIN_UNIT_L1, 
+			F.createLiteral(row[3].isEmpty() ? "Belgique" : row[3], "fr")));
+
+		if (! row[4].isEmpty()) {
+			s.add(F.createStatement(addr, LOCN.POST_CODE, F.createLiteral(row[4])));
+		}
+		if (! row[5].isEmpty()) {
+			s.add(F.createStatement(addr, LOCN.POST_NAME, F.createLiteral(row[5], "nl")));
+		}
+		if (! row[6].isEmpty()) {
+			s.add(F.createStatement(addr, LOCN.POST_NAME, F.createLiteral(row[6], "fr")));
+		}
+		if (! row[7].isEmpty()) {
+			s.add(F.createStatement(addr, LOCN.THOROUGHFARE, F.createLiteral(row[7], "nl")));
+		}
+		if (! row[8].isEmpty()) {
+			s.add(F.createStatement(addr, LOCN.THOROUGHFARE, F.createLiteral(row[8], "fr")));
+		}
+		if (! row[9].isEmpty()) {
+			String no = row[10].isEmpty() ? row[9] : row[9] + " " + row[10];
+			s.add(F.createStatement(addr, LOCN.LOCATOR_DESIGNATOR, F.createLiteral(no)));
+		}
+		return s.build();
+	};
+	
 	/**
 	 * Generate stream of activities
 	 */
