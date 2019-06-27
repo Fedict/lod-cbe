@@ -94,7 +94,7 @@ public class Main {
 	};
 
 	/**
-	 * Generate activity ID to delet
+	 * Generate activity ID to delete
 	 */
 	private final static Function<String[], String> Activities_del = row -> {
 		return CBEConverter.makeID(row[0]).toString();

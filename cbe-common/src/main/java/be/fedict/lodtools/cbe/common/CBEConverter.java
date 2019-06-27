@@ -25,6 +25,7 @@
  */
 package be.fedict.lodtools.cbe.common;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -65,9 +66,7 @@ public class CBEConverter {
 
 	public final static String ORG_BELGIF = "http://org.belgif.be";
 	
-
 	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/auth/nace2008/";
-	private final static String DOM_PREF_NACE3 = "http://vocab.belgif.be/auth/nace2003/";
 	private final static String DOM_PREF_TYPE = "http://vocab.belgif.be/auth/orgtype/";
 	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
 
@@ -76,6 +75,11 @@ public class CBEConverter {
 	private final static String PREFIX_SITE = "/id/cbe/site/";
 	private final static String PREFIX_ADDR = "/id/cbe/addr/";
 
+	private final static String RAMON_NACE = "http://ec.europa.eu/eurostat/ramon/ontologies/nace.rdf#";
+	private final static String RAMON_DATA = "http://ec.europa.eu/eurostat/ramon/rdfdata/nace_r2/";
+	private final static IRI NACE_ACT = F.createIRI(RAMON_NACE + "Activity");
+	private final static IRI NACE_CODE = F.createIRI(RAMON_NACE + "code");
+	
 	/**
 	 * Make unique ID for an organization or site
 	 *
@@ -111,9 +115,11 @@ public class CBEConverter {
 		String prefPart = "";
 		for (String part: parts) {
 			if (part != null && !part.isEmpty() && !part.equals(prefPart)) {
-				s.append(part.replaceAll("\\W", "_"));
+				prefPart = part;
+				s.append(part.replaceAll("\\W", "_")).append("_");
 			}
 		}
+		s.deleteCharAt(s.length()-1);
 		return F.createIRI(s.toString());
 	}
 	
@@ -141,23 +147,6 @@ public class CBEConverter {
 		}
 		return F.createIRI(new StringBuilder(DOM_PREF_TYPE)
 			.append("CBE").append(cbe.trim()).toString());
-	}
-
-	/**
-	 * Make NACEbel ID
-	 *
-	 * @param code NACEbel code as string
-	 * @param ver NACEbel version
-	 * @return IRI
-	 */
-	public static IRI makeNACE(String code, String ver) {
-		if (code == null || code.trim().isEmpty()) {
-			LOG.warn("Empty NACE code");
-			return null;
-		}
-		String prefix = ver.startsWith("2003") ? DOM_PREF_NACE3 : DOM_PREF_NACE8;
-		return F.createIRI(new StringBuilder(prefix)
-			.append(code.trim()).toString());
 	}
 
 	/**
@@ -226,6 +215,23 @@ public class CBEConverter {
 			LOG.warn("Incorrect URL {}", s);
 			return null;
 		}
+	}
+
+	/**
+	 * Get broader NACEbel code or null
+	 * 
+	 * @param code nacebel code
+	 * @return broader code as string or null
+	 */
+	public static String broaderNace(String code) {
+		int len = code.length();
+		if (len > 2 && len < 6) {
+			return code.substring(0, len - 2);
+		}
+		if (len == 7) {
+			return code.substring(0, len - 3);
+		}
+		return null;
 	}
 
 	/**
@@ -327,11 +333,30 @@ public class CBEConverter {
 	 */
 	public final static Function<String[], Stream<Statement>> Codes = row -> {
 		Stream.Builder<Statement> s = Stream.builder();
-		if (row[0].equals("JuridicalForm")) {
-			IRI subj = makeOrgtype(row[1]);
-			Literal label = F.createLiteral(row[3], row[2].toLowerCase());
-			s.add(F.createStatement(subj, RDF.TYPE, SKOS.CONCEPT));
-			s.add(F.createStatement(subj, SKOS.PREF_LABEL, label));
+
+		switch(row[0]) {
+			case "JuridicalForm":
+				IRI subj = makeOrgtype(row[1]);
+				Literal label = F.createLiteral(row[3], row[2].toLowerCase());
+				s.add(F.createStatement(subj, RDF.TYPE, SKOS.CONCEPT));
+				s.add(F.createStatement(subj, SKOS.PREF_LABEL, label));
+				break;
+			case "Nace2008":
+				IRI nacebel = F.createIRI(DOM_PREF_NACE8 + row[2]);
+				s.add(F.createStatement(nacebel, RDF.TYPE, SKOS.CONCEPT));
+				s.add(F.createStatement(nacebel, SKOS.NOTATION, F.createLiteral(row[1])));
+				s.add(F.createStatement(nacebel, SKOS.PREF_LABEL, F.createLiteral(row[2], row[3].toLowerCase())));
+				
+				String broader = broaderNace(row[2]);
+				if (broader != null) {
+					s.add(F.createStatement(nacebel, SKOS.BROADER, F.createIRI(DOM_PREF_NACE8 + broader)));
+				}
+				IRI pred = (row[2].length() < 5) ? SKOS.EXACT_MATCH : SKOS.BROAD_MATCH;
+				IRI nace = F.createIRI(RAMON_DATA + row[2].substring(0, 2) + "." + row[3].substring(2, 4));
+				s.add(F.createStatement(nacebel, pred, nace));
+				s.add(F.createStatement(nace, RDF.TYPE, NACE_ACT));
+				s.add(F.createStatement(nace, NACE_CODE, F.createLiteral(row[3].substring(0, 4))));
+				break;
 		}
 		return s.build();
 	};
@@ -395,7 +420,7 @@ public class CBEConverter {
 			s.add(F.createStatement(addr, LOCN.THOROUGHFARE, F.createLiteral(row[8], "fr")));
 		}
 		if (! row[9].isEmpty()) {
-			String no = row[10].isEmpty() ? row[9] : row[9] + " " + row[10];
+			String no = row[10].isEmpty() ? row[9] : row[9] + "/" + row[10];
 			s.add(F.createStatement(addr, LOCN.LOCATOR_DESIGNATOR, F.createLiteral(no)));
 		}
 		return s.build();
@@ -405,10 +430,12 @@ public class CBEConverter {
 	 * Generate stream of activities
 	 */
 	public final static Function<String[], Stream<Statement>> Activities = row -> {
-		IRI nace = makeNACE(row[3], row[2]);
-		if (nace == null) {
+		if (row[3].isEmpty() || !row[2].equals("2008")) {
+			// old
 			return Stream.empty();
 		}
-		return Stream.of(F.createStatement(makeID(row[0]), ROV.ORG_ACTIVITY, nace));
+		IRI subj = makeID(row[0]);
+		IRI nacebel = F.createIRI(DOM_PREF_NACE8 + row[3]);
+		return Stream.of(F.createStatement(subj, ROV.ORG_ACTIVITY, nacebel));
 	};
 }
