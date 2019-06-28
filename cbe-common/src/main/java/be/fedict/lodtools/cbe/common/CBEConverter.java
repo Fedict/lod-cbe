@@ -25,7 +25,6 @@
  */
 package be.fedict.lodtools.cbe.common;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -257,6 +256,32 @@ public class CBEConverter {
 	}
 
 	/**
+	 * Guess languages based on zip code
+	 * 
+	 * @param code zip code
+	 * @return language code or empty string
+	 */
+	public static String guessLang(String code) {
+		int i = 0;
+		
+		try {
+			i = Integer.valueOf(code);
+		} catch (NumberFormatException ioe) {
+			LOG.warn("Could not convert zip code {}", code);
+		}
+
+		if (i < 1300) {
+			return "";
+		}
+		if ((i >= 1300 && i < 1500) || (i >= 4000 && i < 8000)) {
+			return "fr";
+		}
+		if ((i >= 1500 && i < 4000) || (i >= 8000 && i < 10000)) {
+			return "nl";
+		}
+		return "";
+	}
+	/**
 	 * Generate stream of organization name triples
 	 */
 	public final static Function<String[], Stream<Statement>> Names = row -> {
@@ -334,28 +359,41 @@ public class CBEConverter {
 	public final static Function<String[], Stream<Statement>> Codes = row -> {
 		Stream.Builder<Statement> s = Stream.builder();
 
+		IRI subj = null;
+		String lang = row[2].toLowerCase();
+		Literal label = F.createLiteral(row[3], lang);
+		
 		switch(row[0]) {
 			case "JuridicalForm":
-				IRI subj = makeOrgtype(row[1]);
-				Literal label = F.createLiteral(row[3], row[2].toLowerCase());
-				s.add(F.createStatement(subj, RDF.TYPE, SKOS.CONCEPT));
+				subj = makeOrgtype(row[1]);
+
 				s.add(F.createStatement(subj, SKOS.PREF_LABEL, label));
+				if (lang.equals("nl")) { // only once
+					s.add(F.createStatement(subj, RDF.TYPE, SKOS.CONCEPT));
+				}
 				break;
 			case "Nace2008":
-				IRI nacebel = F.createIRI(DOM_PREF_NACE8 + row[2]);
-				s.add(F.createStatement(nacebel, RDF.TYPE, SKOS.CONCEPT));
-				s.add(F.createStatement(nacebel, SKOS.NOTATION, F.createLiteral(row[1])));
-				s.add(F.createStatement(nacebel, SKOS.PREF_LABEL, F.createLiteral(row[2], row[3].toLowerCase())));
+				subj = F.createIRI(DOM_PREF_NACE8 + row[1]);
+
+				s.add(F.createStatement(subj, SKOS.PREF_LABEL, label));
+
+				if (lang.equals("nl")) { // only once
+					s.add(F.createStatement(subj, RDF.TYPE, SKOS.CONCEPT));
+					s.add(F.createStatement(subj, SKOS.NOTATION, F.createLiteral(row[1])));
 				
-				String broader = broaderNace(row[2]);
-				if (broader != null) {
-					s.add(F.createStatement(nacebel, SKOS.BROADER, F.createIRI(DOM_PREF_NACE8 + broader)));
+					String broader = broaderNace(row[2]);
+					if (broader != null) {
+						s.add(F.createStatement(subj, SKOS.BROADER, F.createIRI(DOM_PREF_NACE8 + broader)));
+					}
+					int len = row[1].length();
+					IRI pred = (len < 5) ? SKOS.EXACT_MATCH : SKOS.BROAD_MATCH;
+					String ramon = row[1].substring(0, Math.min(len, 2));
+					if (len > 2) {
+						ramon += "." + row[1].substring(2, Math.min(len, 4));
+					}
+					IRI nace = F.createIRI(RAMON_DATA + ramon);
+					s.add(F.createStatement(subj, pred, nace));
 				}
-				IRI pred = (row[2].length() < 5) ? SKOS.EXACT_MATCH : SKOS.BROAD_MATCH;
-				IRI nace = F.createIRI(RAMON_DATA + row[2].substring(0, 2) + "." + row[3].substring(2, 4));
-				s.add(F.createStatement(nacebel, pred, nace));
-				s.add(F.createStatement(nace, RDF.TYPE, NACE_ACT));
-				s.add(F.createStatement(nace, NACE_CODE, F.createLiteral(row[3].substring(0, 4))));
 				break;
 		}
 		return s.build();
@@ -404,19 +442,23 @@ public class CBEConverter {
 		s.add(F.createStatement(addr, LOCN.ADMIN_UNIT_L1, 
 			F.createLiteral(row[3].isEmpty() ? "Belgique" : row[3], "fr")));
 
-		if (! row[4].isEmpty()) {
+		if (!row[4].isEmpty()) {
 			s.add(F.createStatement(addr, LOCN.POST_CODE, F.createLiteral(row[4])));
 		}
-		if (! row[5].isEmpty()) {
+
+		// guess language for Belgian municipalities based on zip code
+		String guess = row[2].isEmpty() ? guessLang(row[4]) : "";
+		// only output the municipality names and street names if the names are really different
+		if (!row[5].isEmpty() && (!row[5].equals(row[6]) || !guess.equals("fr"))) {
 			s.add(F.createStatement(addr, LOCN.POST_NAME, F.createLiteral(row[5], "nl")));
 		}
-		if (! row[6].isEmpty()) {
+		if (!row[6].isEmpty() && (!row[6].equals(row[5]) || !guess.equals("nl"))) {
 			s.add(F.createStatement(addr, LOCN.POST_NAME, F.createLiteral(row[6], "fr")));
 		}
-		if (! row[7].isEmpty()) {
+		if (!row[7].isEmpty() && (!row[7].equals(row[8]) || !guess.equals("fr"))) {
 			s.add(F.createStatement(addr, LOCN.THOROUGHFARE, F.createLiteral(row[7], "nl")));
 		}
-		if (! row[8].isEmpty()) {
+		if (!row[8].isEmpty() && (!row[8].equals(row[7]) || !guess.equals("nl"))) {
 			s.add(F.createStatement(addr, LOCN.THOROUGHFARE, F.createLiteral(row[8], "fr")));
 		}
 		if (! row[9].isEmpty()) {

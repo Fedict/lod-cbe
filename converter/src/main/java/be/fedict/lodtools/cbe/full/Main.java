@@ -134,7 +134,7 @@ public class Main {
 		}
 
 		// organization types
-		try (FileOutputStream fout = new FileOutputStream(outt);
+		try (FileOutputStream fout = new FileOutputStream(outf, true);
 			BufferedWriter w = new BufferedWriter(
 				new OutputStreamWriter(fout, StandardCharsets.UTF_8))) {
 			RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
