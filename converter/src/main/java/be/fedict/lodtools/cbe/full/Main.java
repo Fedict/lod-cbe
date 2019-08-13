@@ -75,6 +75,9 @@ public class Main {
 			put("contact.csv", CBEConverter.Contacts);
 			put("activity.csv", CBEConverter.Activities);
 			put("address.csv", CBEConverter.Addresses);
+			put("Brussels_addresses.csv", CBEConverter.Best);
+			put("Flanders_addresses.csv", CBEConverter.Best);
+			put("Wallonia_addresses.csv", CBEConverter.Best);
 		}
 	};
 

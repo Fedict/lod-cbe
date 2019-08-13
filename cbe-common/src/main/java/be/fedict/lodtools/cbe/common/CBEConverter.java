@@ -40,6 +40,7 @@ import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 import org.eclipse.rdf4j.model.vocabulary.DCTERMS;
 import org.eclipse.rdf4j.model.vocabulary.FOAF;
+import org.eclipse.rdf4j.model.vocabulary.GEO;
 import org.eclipse.rdf4j.model.vocabulary.LOCN;
 import org.eclipse.rdf4j.model.vocabulary.ORG;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
@@ -111,10 +112,10 @@ public class CBEConverter {
 	 */
 	public static IRI makeAddress(String... parts) {
 		StringBuilder s = new StringBuilder(ORG_BELGIF).append(PREFIX_ADDR);
-		String prefPart = "";
+		String prevPart = "";
 		for (String part: parts) {
-			if (part != null && !part.isEmpty() && !part.equals(prefPart)) {
-				prefPart = part;
+			if (part != null && !part.isEmpty() && !part.equals(prevPart)) {
+				prevPart = part;
 				s.append(part.replaceAll("\\W", "_")).append("_");
 			}
 		}
@@ -467,6 +468,21 @@ public class CBEConverter {
 		}
 		return s.build();
 	};
+	
+	/**
+	 * Generate stream of BEST address GPS positions.
+	 * This will not match all addresses in CBE, just an attempt.
+	 */
+	public final static Function<String[], Stream<Statement>> Best = row -> {
+		Stream.Builder<Statement> s = Stream.builder();
+
+		IRI addr = makeAddress(row[11], row[2], row[3], row[4], row[9], row[10]);
+		String point = "POINT(" + row[18] + " " + row[19] + ")";
+		s.add(F.createStatement(addr, LOCN.GEOMETRY_PROP, F.createLiteral(point, GEO.WKT_LITERAL)));
+		
+		return s.build();
+	};		
+	
 	
 	/**
 	 * Generate stream of activities
