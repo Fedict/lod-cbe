@@ -476,8 +476,8 @@ public class CBEConverter {
 	public final static Function<String[], Stream<Statement>> Best = row -> {
 		Stream.Builder<Statement> s = Stream.builder();
 
-		IRI addr = makeAddress(row[11], row[2], row[3], row[4], row[9], row[10]);
-		String point = "POINT(" + row[18] + " " + row[19] + ")";
+		IRI addr = makeAddress(row[11], row[2], row[3], row[4], row[5], row[11]);
+		String point = "POINT(" + row[19] + " " + row[20] + ")";
 		s.add(F.createStatement(addr, LOCN.GEOMETRY_PROP, F.createLiteral(point, GEO.WKT_LITERAL)));
 		
 		return s.build();

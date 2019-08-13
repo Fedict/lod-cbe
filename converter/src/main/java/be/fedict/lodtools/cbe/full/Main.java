@@ -75,6 +75,14 @@ public class Main {
 			put("contact.csv", CBEConverter.Contacts);
 			put("activity.csv", CBEConverter.Activities);
 			put("address.csv", CBEConverter.Addresses);
+		}
+	};
+
+	/**
+	 * Map files to the functions generating RDF triples.
+	 */
+	private final static HashMap<String, Function> MAP_BEST = new HashMap<String, Function>() {
+		{
 			put("Brussels_addresses.csv", CBEConverter.Best);
 			put("Flanders_addresses.csv", CBEConverter.Best);
 			put("Wallonia_addresses.csv", CBEConverter.Best);
@@ -116,7 +124,8 @@ public class Main {
 		File base = new File(args[0]);
 		File outf = new File(args[1], "cbe.nt");
 		File outt = new File(args[1], "cbetypes.nt");
-
+		File outb = new File(args[1], "bestgps.nt");
+		
 		LOG.info("--- START ---");
 		LOG.info("Params in = {}, out = {}", base);
 
@@ -131,6 +140,22 @@ public class Main {
 				LOG.info("Reading CSV file {}", file);
 				InputStream fin = new FileInputStream(new File(base, file));
 				add(rdf, new InputStreamReader(fin, StandardCharsets.UTF_8), MAP.get(file));
+			}
+
+			rdf.endRDF();
+		}
+
+		// geocoordinates
+		try (FileOutputStream fout = new FileOutputStream(outb);
+			BufferedWriter w = new BufferedWriter(
+				new OutputStreamWriter(fout, StandardCharsets.UTF_8))) {
+			RDFWriter rdf = Rio.createWriter(RDFFormat.NTRIPLES, w);
+			rdf.startRDF();
+
+			for (String file : MAP_BEST.keySet()) {
+				LOG.info("Reading CSV file {}", file);
+				InputStream fin = new FileInputStream(new File(base, file));
+				add(rdf, new InputStreamReader(fin, StandardCharsets.UTF_8), MAP_BEST.get(file));
 			}
 
 			rdf.endRDF();
