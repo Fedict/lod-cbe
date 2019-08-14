@@ -26,20 +26,27 @@
 package be.fedict.lodtools.cbe.common;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.RFC4180Parser;
+import com.opencsv.RFC4180ParserBuilder;
+import java.io.IOException;
 
 import java.io.Reader;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 /**
  * Small helper class.
  *
  * @author Bart Hanssens <bart.hanssens@fedict.be>
  */
-public class CsvBulkReader extends CSVReader {
-
+public class CsvBulkReader implements AutoCloseable {
+	private final CSVReader  csv;
 	private final Iterator<String[]> iter;
 
 	/**
@@ -74,7 +81,20 @@ public class CsvBulkReader extends CSVReader {
 	 * @param reader
 	 */
 	public CsvBulkReader(Reader reader) {
-		super(reader, ',', '\"', 1);
-		iter = this.iterator();
+		CSVReaderBuilder builder = new CSVReaderBuilder(reader);
+		builder.withCSVParser(new RFC4180ParserBuilder().build())
+				.withSkipLines(1);
+		
+		csv = builder.build();
+		iter = csv.iterator();
+	}
+
+	@Override
+	public void close() {
+		try {
+			csv.close();
+		} catch (IOException ex) {
+			//
+		}
 	}
 }
