@@ -128,7 +128,7 @@ public class Main {
 		
 		LOG.info("--- START ---");
 		LOG.info("Params in = {}, out = {}", base);
-/*
+
 		// companies / organizations
 		try (FileOutputStream fout = new FileOutputStream(outf);
 			BufferedWriter w = new BufferedWriter(
@@ -144,7 +144,7 @@ public class Main {
 
 			rdf.endRDF();
 		}
-*/
+
 		// geocoordinates
 		try (FileOutputStream fout = new FileOutputStream(outb);
 			BufferedWriter w = new BufferedWriter(
