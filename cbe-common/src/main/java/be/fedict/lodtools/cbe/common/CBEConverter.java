@@ -114,9 +114,15 @@ public class CBEConverter {
 		StringBuilder s = new StringBuilder(ORG_BELGIF).append(PREFIX_ADDR);
 		String prevPart = "";
 		for (String part: parts) {
-			if (part != null && !part.isEmpty() && !part.equals(prevPart)) {
-				prevPart = part;
-				s.append(part.replaceAll("\\W", "_")).append("_");
+			if (part != null && !part.isEmpty()) {
+				int i = part.indexOf("(");
+				if (i > 0) {
+					part = part.substring(0, i);
+				}
+				if (!part.equals(prevPart)) {
+					prevPart = part;
+					s.append(part.replaceAll("\\W", "_")).append("_");
+				}
 			}
 		}
 
