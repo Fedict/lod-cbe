@@ -74,7 +74,7 @@ public class CsvBulkReader extends CSVReader {
 	 * @param reader
 	 */
 	public CsvBulkReader(Reader reader) {
-		super(reader, ',', '"', 1);
+		super(reader, ',', '\"', 1);
 		iter = this.iterator();
 	}
 }
