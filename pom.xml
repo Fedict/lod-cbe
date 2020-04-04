@@ -9,7 +9,8 @@
         <module>converter</module>
         <module>cbe-updater</module>
         <module>cbe-common</module>
-    </modules>
+        <module>cbe-proxy</module>
+	</modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
