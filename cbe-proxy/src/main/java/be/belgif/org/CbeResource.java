@@ -25,10 +25,14 @@
  */
 package be.belgif.org;
 
+import be.belgif.org.dao.CbeOrganization;
 import javax.inject.Inject;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -41,10 +45,18 @@ public class CbeResource {
 	@Inject
     @RestClient
 	CbePublicSearch pubSearch;
-	
+
 	@GET
 	@Path("/org/{id}")
-	public String org(@PathParam("id") String id) {
+	@Produces(MediaType.TEXT_HTML)
+	public CbeOrganization org(@PathParam("id") String id) {
 		return pubSearch.getOrgById(id.replace("_", ""));
+	}
+
+	@GET
+	@Path("/site/{id}")
+	@Produces(MediaType.TEXT_HTML)
+	public String site(@PathParam("id") String id) {
+		return pubSearch.getSiteById(id.replace("_", ""));
 	}
 }

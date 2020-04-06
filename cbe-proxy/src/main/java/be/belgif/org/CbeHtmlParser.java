@@ -26,32 +26,49 @@
 package be.belgif.org;
 
 import be.belgif.org.dao.CbeOrganization;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
 
-import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import java.util.Map;
+
+import org.attoparser.simple.AbstractSimpleMarkupHandler;
+
 
 /**
- *
- * @author Bart.Hanssens
+ * Converts HTML page from CBE into RDF
+ * 
+ * @author Bart Hanssens
  */
-@RegisterRestClient
-public interface CbePublicSearch {
-	@GET
-	@Path("/toonondernemingps.html")
-	@Produces(MediaType.TEXT_HTML)
-	public CbeOrganization getOrgById(@QueryParam("ondernemingsnummer") String id);
-
-	@GET
-	@Path("/vestiginglijst.html")
-	@Produces(MediaType.TEXT_HTML)
-	public String getSiteListById(@QueryParam("ondernemingsnummer") String id);
+public class CbeHtmlParser extends AbstractSimpleMarkupHandler {
+	private CbeOrganization org = new CbeOrganization();
 	
-	@GET
-	@Path("/toonvestigingps.html")
-	@Produces(MediaType.TEXT_HTML)
-	public String getSiteById(@QueryParam("vestigingsnummer") String id);
+	private boolean inTableHeader;
+	private String tableHeader;
+	private String key;
+
+	@Override
+	public void handleOpenElement(String elementName, Map<String,String> attributes, int line, int col) {
+		if ("td".equals(elementName) && "I".equals(attributes.get("class"))) {
+			inTableHeader = true;
+		}
+	}
+
+	@Override
+	public void handleText(char[] buffer, int offset, int len, int line, int col) {
+		if (inTableHeader) {
+			tableHeader = new String(buffer);
+			inTableHeader = false;
+		}
+	}
+
+	@Override
+	public void handleCloseElement(String elementName, int line, int col) {
+		if ("tr".equals(elementName)) {
+			processRow();
+		}
+	}
+	
+	private void processRow() {
+		if ("Algemeen".equals(tableHeader)) {
+			
+		}
+	}
 }
