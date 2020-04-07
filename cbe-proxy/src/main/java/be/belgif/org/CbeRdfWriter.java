@@ -26,14 +26,12 @@
 package be.belgif.org;
 
 import be.belgif.org.dao.CbeOrganization;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.Map.Entry;
-import static java.util.Map.entry;
-import java.util.Set;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -41,9 +39,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.attoparser.config.ParseConfiguration;
-import org.attoparser.simple.ISimpleMarkupParser;
-import org.attoparser.simple.SimpleMarkupParser;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.rdf4j.model.IRI;
 
@@ -69,25 +65,29 @@ import org.eclipse.rdf4j.rio.Rio;
 public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 
 	@ConfigProperty(name = "be.belgif.org.prefix.organization")
-	private String orgPrefix;
+	String orgPrefix;
+
+	@ConfigProperty(name = "be.belgif.org.prefix.site")
+	String sitePrefix;
 
 	private final ValueFactory F = SimpleValueFactory.getInstance();
 
 	@Override
 	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return true;
-		// return RDFFormat.TURTLE.hasMIMEType(arg3.toString());
+		return genericType instanceof CbeOrganization;
 	}
 
 	@Override
-	public long getSize(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+	public long getSize(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, 
+						MediaType mediaType) {
 		return -1;
 	}
 
 	@Override
-	public void writeTo(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, 
-											MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
-			throws IOException, WebApplicationException {
+	public void writeTo(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, 
+			MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
+				throws IOException, WebApplicationException {
+		System.err.println("Write To");
 		Rio.write(mapOrgToModel(t), entityStream, RDFFormat.NTRIPLES);
 	}
 

@@ -53,5 +53,5 @@ public interface CbePublicSearch {
 	@GET
 	@Path("/toonvestigingps.html")
 	@Produces(MediaType.TEXT_HTML)
-	public String getSiteById(@QueryParam("vestigingsnummer") String id);
+	public CbeOrganization getSiteById(@QueryParam("vestigingsnummer") String id);
 }

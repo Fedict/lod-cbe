@@ -1,6 +1,7 @@
 
 import io.quarkus.test.junit.QuarkusTest;
 import static io.restassured.RestAssured.given;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
 /*
@@ -38,8 +39,7 @@ public class CbeResourceTest {
 	@Test    
     public void testEndpoint() {
         given()
-          .when().get("/id/cbe/org/0671_516_647")
-          .then()
-             .statusCode(200);
+          .when().accept("application/n-triples").get("/id/cbe/org/0671_516_647")
+          .then().statusCode(200);
     }
 }

@@ -48,15 +48,15 @@ public class CbeResource {
 
 	@GET
 	@Path("/org/{id}")
-	@Produces(MediaType.TEXT_HTML)
+	@Produces("application/n-triples")
 	public CbeOrganization org(@PathParam("id") String id) {
 		return pubSearch.getOrgById(id.replace("_", ""));
 	}
 
 	@GET
 	@Path("/site/{id}")
-	@Produces(MediaType.TEXT_HTML)
-	public String site(@PathParam("id") String id) {
+	@Produces("application/n-triples")
+	public CbeOrganization site(@PathParam("id") String id) {
 		return pubSearch.getSiteById(id.replace("_", ""));
 	}
 }
