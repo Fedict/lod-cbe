@@ -55,17 +55,17 @@ import org.jsoup.nodes.Element;
 @Consumes(MediaType.TEXT_HTML)
 public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	@ConfigProperty(name = "be.belgif.org.baseurl")
-	String BASEURL;
+	protected String BASEURL;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.table.general")
-	String TABLE_GENERAL;
+	protected String TABLE_GENERAL;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.general.id")
-	String GENERAL_ID;
+	protected String GENERAL_ID;
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return true;
+		return genericType.equals(CbeOrganization.class);
 	}
 
 	@Override

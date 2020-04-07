@@ -41,8 +41,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.rdf4j.model.IRI;
 
+import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
@@ -65,16 +65,16 @@ import org.eclipse.rdf4j.rio.Rio;
 public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 
 	@ConfigProperty(name = "be.belgif.org.prefix.organization")
-	String orgPrefix;
+	protected String orgPrefix;
 
 	@ConfigProperty(name = "be.belgif.org.prefix.site")
-	String sitePrefix;
+	protected String sitePrefix;
 
 	private final ValueFactory F = SimpleValueFactory.getInstance();
 
 	@Override
 	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return genericType instanceof CbeOrganization;
+		return genericType.equals(CbeOrganization.class);
 	}
 
 	@Override
@@ -87,7 +87,6 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 	public void writeTo(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, 
 			MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
 				throws IOException, WebApplicationException {
-		System.err.println("Write To");
 		Rio.write(mapOrgToModel(t), entityStream, RDFFormat.NTRIPLES);
 	}
 
