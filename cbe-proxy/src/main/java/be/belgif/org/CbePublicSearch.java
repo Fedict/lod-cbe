@@ -35,7 +35,9 @@ import javax.ws.rs.core.MediaType;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 /**
- *
+ * HTTP client that will perform the search on the CBE website
+ * 
+ * @see <a "https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html">CBE search</a>
  * @author Bart.Hanssens
  */
 @RegisterRestClient

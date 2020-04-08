@@ -56,7 +56,7 @@ import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
 /**
- * Converts HTML page from CBE into RDF
+ * Converts Java object into ORG/ROV triples
  * 
  * @author Bart Hanssens
  */

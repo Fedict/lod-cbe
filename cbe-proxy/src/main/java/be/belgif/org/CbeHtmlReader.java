@@ -47,9 +47,10 @@ import org.jsoup.nodes.Element;
 
 
 /**
- * Converts HTML page from CBE into RDF
+ * Converts HTML result page from CBE public search into a Java object
  * 
  * @author Bart Hanssens
+ * @see <a href="https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html">Public Search</a>
  */
 @Provider
 @Consumes(MediaType.TEXT_HTML)
