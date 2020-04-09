@@ -5,7 +5,7 @@ A simple reverse proxy for converting the output from the Belgian "Crossroad Ban
 
 See also https://kbopub.economie.fgov.be/kbopub/zoeknaamfonetischform.html
 
-!(flow)[flow.png]
+![flow](flow.png)
 
 ## Example
 
