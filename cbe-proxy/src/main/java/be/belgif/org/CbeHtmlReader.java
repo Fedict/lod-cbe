@@ -39,6 +39,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.jsoup.Jsoup;
@@ -83,15 +84,9 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 
 	@ConfigProperty(name = "be.belgif.org.html.org.lang.german")
 	protected String LANG_DE;
-	
-	@ConfigProperty(name = "be.belgif.org.html.org.table.vat")
-	protected String TABLE_VAT;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.vat.activity")
 	protected String VAT_ACTIVITY;
-
-	@ConfigProperty(name = "be.belgif.org.html.org.table.nsso")
-	protected String TABLE_NSSO;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.nsso.activity")
 	protected String NSSO_ACTIVITY;
@@ -159,20 +154,13 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 			org.setWebsite(website.attr("href"));
 		}
 		
-		Element vatTable = doc.selectFirst(TABLE_VAT);
-		if (vatTable != null) {
-			Elements activities = vatTable.select(VAT_ACTIVITY);
-			for (Element act: activities) {
-				org.setVatActivity(act.attr("href"));
-			}
+		Elements vatActivities = table.select(VAT_ACTIVITY);
+		for (Element act: vatActivities) {
+			org.setVatActivity(act.text());
 		}
-	
-		Element nssoTable = doc.selectFirst(TABLE_NSSO);
-		if (nssoTable != null) {
-			Elements activities = nssoTable.select(NSSO_ACTIVITY);
-			for (Element act: activities) {
-				org.setNssActivity(act.attr("href"));
-			}
+		Elements nssActivities = table.select(NSSO_ACTIVITY);
+		for (Element act: nssActivities) {
+			org.setNssActivity(act.text());
 		}
 	
 		return org;
