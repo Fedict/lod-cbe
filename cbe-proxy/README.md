@@ -5,6 +5,8 @@ A simple reverse proxy for converting the output from the Belgian "Crossroad Ban
 
 See also https://kbopub.economie.fgov.be/kbopub/zoeknaamfonetischform.html
 
+!(flow)[flow.png]
+
 ## Example
 
 Currently the conversion is very limited, e.g. the page https://kbopub.economie.fgov.be/kbopub/toonondernemingps.html?ondernemingsnummer=671516647 is turned into (N-Triples):
