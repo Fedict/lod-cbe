@@ -44,6 +44,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.jsoup.select.Evaluator;
 
 
 /**
@@ -64,6 +66,36 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	@ConfigProperty(name = "be.belgif.org.html.org.general.id")
 	protected String GENERAL_ID;
 
+	@ConfigProperty(name = "be.belgif.org.html.org.general.names")
+	protected String GENERAL_NAMES;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.general.abbrevs")
+	protected String GENERAL_ABBREVS;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.general.website")
+	protected String GENERAL_WEBSITE;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.lang.dutch")
+	protected String LANG_NL;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.lang.french")
+	protected String LANG_FR;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.lang.german")
+	protected String LANG_DE;
+	
+	@ConfigProperty(name = "be.belgif.org.html.org.table.vat")
+	protected String TABLE_VAT;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.vat.activity")
+	protected String VAT_ACTIVITY;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.table.nsso")
+	protected String TABLE_NSSO;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.nsso.activity")
+	protected String NSSO_ACTIVITY;
+
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
 		return genericType.equals(CbeOrganization.class);
@@ -76,16 +108,73 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 		return parseOrganization(in);
 	}
 	
-	private CbeOrganization parseOrganization(InputStream in) throws IOException {
+	/**
+	 * Parse the HTML page about an organization (company, public service...)
+	 * 
+	 * @param in
+	 * @return
+	 * @throws IOException 
+	 */
+	private CbeOrganization parseOrganization(InputStream in) throws IOException {		
 		CbeOrganization org = new CbeOrganization();
 		
 		Document doc = Jsoup.parse(in, StandardCharsets.UTF_8.toString(), BASEURL);
 		Element table = doc.selectFirst(TABLE_GENERAL);
 		Element id = table.selectFirst(GENERAL_ID);
+		Element names = table.selectFirst(GENERAL_NAMES);
+		Element abbrevs = table.selectFirst(GENERAL_ABBREVS);
+		Element website = table.selectFirst(GENERAL_WEBSITE);
 
 		if (id != null) {
 			org.setId(id.ownText().trim());
 		}
+
+		if (names != null) {
+			Elements els = names.select(new Evaluator.MatchText());
+			for(int i = 1; i < els.size(); i += 2) {
+				String val = els.get(i-1).text().trim();
+				if (els.get(i).selectFirst(LANG_NL) != null) org.setName("nl", val);
+				if (els.get(i).selectFirst(LANG_FR) != null) org.setName("fr", val);
+				if (els.get(i).selectFirst(LANG_DE) != null) org.setName("de", val);
+			}
+			if (org.getNames().isEmpty()) {
+				org.setName("", names.text());
+			}
+		}
+
+		if (abbrevs != null) {
+			Elements els = abbrevs.select(new Evaluator.MatchText());
+			for(int i = 1; i < els.size(); i += 2) {
+				String val = els.get(i-1).text().trim();
+				if (els.get(i).selectFirst(LANG_NL) != null) org.setAbbrev("nl", val);
+				if (els.get(i).selectFirst(LANG_FR) != null) org.setAbbrev("fr", val);
+				if (els.get(i).selectFirst(LANG_DE) != null) org.setAbbrev("de", val);
+			}
+			if (org.getAbbrevs().isEmpty()) {
+				org.setAbbrev("", abbrevs.text());
+			}
+		}
+
+		if (website != null) {
+			org.setWebsite(website.attr("href"));
+		}
+		
+		Element vatTable = doc.selectFirst(TABLE_VAT);
+		if (vatTable != null) {
+			Elements activities = vatTable.select(VAT_ACTIVITY);
+			for (Element act: activities) {
+				org.setVatActivity(act.attr("href"));
+			}
+		}
+	
+		Element nssoTable = doc.selectFirst(TABLE_NSSO);
+		if (nssoTable != null) {
+			Elements activities = nssoTable.select(NSSO_ACTIVITY);
+			for (Element act: activities) {
+				org.setNssActivity(act.attr("href"));
+			}
+		}
+	
 		return org;
 	}
 }

@@ -70,6 +70,9 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 	@ConfigProperty(name = "be.belgif.org.prefix.site")
 	protected String sitePrefix;
 
+	@ConfigProperty(name = "be.belgif.org.prefix.nace")
+	protected String nacePrefix;
+
 	private final ValueFactory F = SimpleValueFactory.getInstance();
 
 	@Override
@@ -104,7 +107,12 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		for (Entry<String, String> e: org.getAbbrevs().entrySet()) {
 			m.add(id, SKOS.ALT_LABEL, F.createLiteral(e.getValue(), e.getKey()));
 		}		
-
+		for (String act: org.getNssActivities()) {
+			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replaceAll("\\.", "")));
+		}
+		for (String act: org.getVatActivities()) {
+			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replaceAll("\\.", "")));
+		}
 		if (org.getWebsite() != null) {
 			m.add(id, FOAF.HOMEPAGE, F.createIRI(org.getWebsite()));
 		}
