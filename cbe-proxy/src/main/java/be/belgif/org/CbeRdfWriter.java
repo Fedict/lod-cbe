@@ -93,7 +93,6 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		Rio.write(mapOrgToModel(t), entityStream, RDFFormat.NTRIPLES);
 	}
 
-
 	private Model mapOrgToModel(CbeOrganization org) {
 		Model m = new LinkedHashModel();
 

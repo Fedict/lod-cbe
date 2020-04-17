@@ -25,9 +25,19 @@
  */
 package be.belgif.org;
 
-import io.quarkus.test.junit.QuarkusTest;
-import static io.restassured.RestAssured.given;
+import be.belgif.org.dao.CbeOrganization;
 
+import io.quarkus.test.junit.QuarkusTest;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -35,11 +45,25 @@ import org.junit.jupiter.api.Test;
  * @author Bart.Hanssens
  */
 @QuarkusTest
-public class CbeResourceTest {
-	@Test    
-    public void testEndpoint() {
-        given()
-          .when().accept("application/n-triples").get("/id/cbe/org/0671_516_647")
-          .then().statusCode(200);
-    }
+public class CbeHtmlReaderTest {
+	@Inject
+	CbeHtmlReader reader;
+
+	@Test
+    public void testReader() {
+		CbeOrganization org = null;
+		
+		try(InputStream in = this.getClass().getResourceAsStream("test.html")) {
+			org = reader.readFrom(CbeOrganization.class, CbeOrganization.class, new Annotation[0], MediaType.WILDCARD_TYPE,
+				new MultivaluedHashMap<>(), in);
+		} catch (IOException ex) {
+			fail(ex.getMessage());
+		}
+		
+		if (org == null) {
+			fail("Org is null");
+		}
+		
+		assertEquals(org.getWebsite(), "http://www.bosa.be");
+	}
 }

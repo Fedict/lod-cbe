@@ -100,7 +100,6 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	public CbeOrganization readFrom(Class<CbeOrganization> type, Type genericType, Annotation[] annotations, 
 			MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream in) 
 				throws IOException, WebApplicationException {
-		System.err.println("HTML" + new String(in.readAllBytes()));
 		return parseOrganization(in);
 	}
 	
@@ -113,7 +112,7 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	 */
 	private CbeOrganization parseOrganization(InputStream in) throws IOException {		
 		CbeOrganization org = new CbeOrganization();
-		
+
 		Document doc = Jsoup.parse(in, StandardCharsets.UTF_8.toString(), BASEURL);
 		Element table = doc.selectFirst(TABLE_GENERAL);
 		Element id = table.selectFirst(GENERAL_ID);
