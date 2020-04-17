@@ -151,7 +151,7 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 		}
 
 		if (website != null) {
-			org.setWebsite(website.attr("href"));
+			org.setWebsite(website.attr("href").trim());
 		}
 		
 		Elements vatActivities = table.select(VAT_ACTIVITY);
