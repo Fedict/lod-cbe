@@ -100,6 +100,7 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	public CbeOrganization readFrom(Class<CbeOrganization> type, Type genericType, Annotation[] annotations, 
 			MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream in) 
 				throws IOException, WebApplicationException {
+		System.err.println("HTML" + new String(in.readAllBytes()));
 		return parseOrganization(in);
 	}
 	
