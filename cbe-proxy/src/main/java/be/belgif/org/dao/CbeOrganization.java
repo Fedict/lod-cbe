@@ -56,7 +56,7 @@ public class CbeOrganization {
 	}
 
 	public void setParentId(String id) {
-		this.parentId = parentId;
+		this.parentId = id;
 	}
 
 	public Map<String,String> getNames() {
