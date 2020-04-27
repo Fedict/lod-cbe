@@ -57,7 +57,7 @@ public class CbeResource {
 
 	@GET
 	@Path("/org/{id}")
-	@Produces("application/n-triples")
+	@Produces({"application/n-triples", "application/ld+json"})
 	public CbeOrganization org(@PathParam("id") String id) {
 		return pubSearch.getOrgById(id.replace("_", ""));
 	}
@@ -70,7 +70,7 @@ public class CbeResource {
 	
 	@GET
 	@Path("/site/{id}")
-	@Produces("application/n-triples")
+	@Produces({"application/n-triples", "application/ld+json"})
 	public CbeOrganization site(@PathParam("id") String id) {
 		return pubSearch.getSiteById(id.replace("_", ""));
 	}
