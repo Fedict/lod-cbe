@@ -129,7 +129,7 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 			org.setParentId(null);
 			org.setId(orgId.ownText().trim());
 		} else {
-			org.setParentId(orgId.ownText().trim());
+			org.setParentId(orgId.text().trim());
 			org.setId(siteId.ownText().trim());
 		}
 

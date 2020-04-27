@@ -75,7 +75,7 @@ public class CbeResource {
 		return pubSearch.getSiteById(id.replace("_", ""));
 	}
 	@GET
-	@Path("/org/{id}")
+	@Path("/site/{id}")
 	@Produces("text/html")
 	public Response siteRedirect(@PathParam("id") String id) {
 		return Response.seeOther(URI.create(REDIRECT_SITE + id.replace("_", ""))).build();
