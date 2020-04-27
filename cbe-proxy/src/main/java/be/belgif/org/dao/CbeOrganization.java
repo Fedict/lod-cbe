@@ -36,6 +36,7 @@ import java.util.Map;
  */
 public class CbeOrganization {
 	private String id;
+	private String parentId;
 	private Map<String,String> names = new HashMap<>(4,1);
 	private Map<String,String> abbrevs = new HashMap<>(4,1);
 	private String website;
@@ -48,6 +49,14 @@ public class CbeOrganization {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String id) {
+		this.parentId = parentId;
 	}
 
 	public Map<String,String> getNames() {

@@ -26,12 +26,15 @@
 package be.belgif.org;
 
 import be.belgif.org.dao.CbeOrganization;
+import java.net.URI;
 import javax.inject.Inject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -42,6 +45,12 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
  */
 @Path("/id/cbe")
 public class CbeResource {
+	@ConfigProperty(name = "be.belgif.org.redirect.org")
+	protected String REDIRECT_ORG;
+
+	@ConfigProperty(name = "be.belgif.org.redirect.site")
+	protected String REDIRECT_SITE;
+			
 	@Inject
     @RestClient
 	CbePublicSearch pubSearch;
@@ -52,11 +61,23 @@ public class CbeResource {
 	public CbeOrganization org(@PathParam("id") String id) {
 		return pubSearch.getOrgById(id.replace("_", ""));
 	}
-
+	@GET
+	@Path("/org/{id}")
+	@Produces("text/html")
+	public Response orgRedirect(@PathParam("id") String id) {
+		return Response.seeOther(URI.create(REDIRECT_ORG + id.replace("_", ""))).build();
+	}
+	
 	@GET
 	@Path("/site/{id}")
 	@Produces("application/n-triples")
 	public CbeOrganization site(@PathParam("id") String id) {
 		return pubSearch.getSiteById(id.replace("_", ""));
+	}
+	@GET
+	@Path("/org/{id}")
+	@Produces("text/html")
+	public Response siteRedirect(@PathParam("id") String id) {
+		return Response.seeOther(URI.create(REDIRECT_SITE + id.replace("_", ""))).build();
 	}
 }
