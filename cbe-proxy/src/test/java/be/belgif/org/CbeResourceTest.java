@@ -36,10 +36,31 @@ import org.junit.jupiter.api.Test;
  */
 @QuarkusTest
 public class CbeResourceTest {
-	@Test    
-    public void testEndpoint() {
+	@Test
+    public void testEndpointOrgNT() {
         given()
           .when().accept("application/n-triples").get("/id/cbe/org/0671_516_647")
+          .then().statusCode(200);
+    }
+
+	@Test
+    public void testEndpointOrgJson() {
+        given()
+          .when().accept("application/ld+json").get("/id/cbe/org/0671_516_647")
+          .then().statusCode(200);
+    }
+	
+	@Test
+    public void testEndpointSiteNT() {
+        given()
+          .when().accept("application/n-triples").get("/id/cbe/site/2_147_812_701")
+          .then().statusCode(200);
+    }
+
+	@Test
+    public void testEndpointSiteJson() {
+        given()
+          .when().accept("application/ld+json").get("/id/cbe/site/2_147_812_701")
           .then().statusCode(200);
     }
 }

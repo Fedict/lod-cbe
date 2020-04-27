@@ -61,7 +61,7 @@ import org.eclipse.rdf4j.rio.Rio;
  * @author Bart Hanssens
  */
 @Provider
-@Produces("application/n-triples")
+@Produces({"application/n-triples", "application/ld+json"})
 public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 
 	@ConfigProperty(name = "be.belgif.org.prefix.organization")
@@ -77,7 +77,10 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 
 	@Override
 	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return genericType.equals(CbeOrganization.class);
+		return genericType.equals(CbeOrganization.class) && 
+			(	RDFFormat.NTRIPLES.hasMIMEType(mediaType.toString()) || 
+				RDFFormat.JSONLD.hasMIMEType(mediaType.toString())	
+			);
 	}
 
 	@Override
@@ -90,16 +93,33 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 	public void writeTo(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, 
 			MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
 				throws IOException, WebApplicationException {
-		Rio.write(mapOrgToModel(t), entityStream, RDFFormat.NTRIPLES);
+		RDFFormat fmt = RDFFormat.NTRIPLES.hasMIMEType(mediaType.toString()) ? RDFFormat.NTRIPLES : RDFFormat.JSONLD;
+		Rio.write(mapOrgToModel(t), entityStream, fmt);
 	}
 
+	/**
+	 * Turn organization object into RDF model
+	 * 
+	 * @param org organization object
+	 * @return RDF Model 
+	 */
 	private Model mapOrgToModel(CbeOrganization org) {
 		Model m = new LinkedHashModel();
 
-		IRI id = F.createIRI(orgPrefix + org.getId().replaceAll("\\.", "_"));
+		String orgId = org.getId().replaceAll("\\.", "_");
+		String parentId = org.getParentId();
+	
+		IRI id;
+		if (parentId == null) {
+			id = F.createIRI(orgPrefix + orgId);
+		} else {
+			id = F.createIRI(sitePrefix + orgId);
+			m.add(id, ORG.SUB_ORGANIZATION_OF, F.createIRI(orgPrefix + parentId.replaceAll("\\.", "_")));
+		}
+
 		m.add(id, RDF.TYPE, ORG.ORGANIZATION);
 		m.add(id, RDF.TYPE, ROV.REGISTERED_ORGANIZATION);
-		
+
 		for (Entry<String, String> e: org.getNames().entrySet()) {
 			m.add(id, ROV.LEGAL_NAME, F.createLiteral(e.getValue(), e.getKey()));
 		}
@@ -111,6 +131,9 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		}
 		for (String act: org.getVatActivities()) {
 			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replaceAll("\\.", "")));
+		}
+		if (org.getEmail() != null) {
+			m.add(id, FOAF.MBOX, F.createIRI(org.getEmail()));
 		}
 		if (org.getWebsite() != null) {
 			m.add(id, FOAF.HOMEPAGE, F.createIRI(org.getWebsite()));

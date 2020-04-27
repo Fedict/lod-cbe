@@ -65,13 +65,19 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	protected String TABLE_GENERAL;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.general.id")
-	protected String GENERAL_ID;
+	protected String GENERAL_ID_ORG;
+
+	@ConfigProperty(name = "be.belgif.org.html.site.general.id")
+	protected String GENERAL_ID_SITE;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.general.names")
 	protected String GENERAL_NAMES;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.general.abbrevs")
 	protected String GENERAL_ABBREVS;
+
+	@ConfigProperty(name = "be.belgif.org.html.org.general.email")
+	protected String GENERAL_EMAIL;
 
 	@ConfigProperty(name = "be.belgif.org.html.org.general.website")
 	protected String GENERAL_WEBSITE;
@@ -115,13 +121,20 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 
 		Document doc = Jsoup.parse(in, StandardCharsets.UTF_8.toString(), BASEURL);
 		Element table = doc.selectFirst(TABLE_GENERAL);
-		Element id = table.selectFirst(GENERAL_ID);
+		Element orgId = table.selectFirst(GENERAL_ID_ORG);
+		Element siteId = table.selectFirst(GENERAL_ID_SITE);
+		
 		Element names = table.selectFirst(GENERAL_NAMES);
 		Element abbrevs = table.selectFirst(GENERAL_ABBREVS);
+		Element email = table.selectFirst(GENERAL_EMAIL);
 		Element website = table.selectFirst(GENERAL_WEBSITE);
 
-		if (id != null) {
-			org.setId(id.ownText().trim());
+		if (siteId == null) {
+			org.setParentId(null);
+			org.setId(orgId.ownText().trim());
+		} else {
+			org.setParentId(orgId.text().trim());
+			org.setId(siteId.ownText().trim());
 		}
 
 		if (names != null) {
@@ -150,6 +163,10 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 			}
 		}
 
+		if (email != null) {
+			org.setEmail(email.attr("href").trim());
+		}
+	
 		if (website != null) {
 			org.setWebsite(website.attr("href").trim());
 		}
