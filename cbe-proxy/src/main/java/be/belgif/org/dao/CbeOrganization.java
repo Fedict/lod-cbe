@@ -39,6 +39,7 @@ public class CbeOrganization {
 	private String parentId;
 	private Map<String,String> names = new HashMap<>(4,1);
 	private Map<String,String> abbrevs = new HashMap<>(4,1);
+	private String email;
 	private String website;
 	private List<String> vatActivities = new ArrayList<>();
 	private List<String> nssActivities = new ArrayList<>();
@@ -81,6 +82,14 @@ public class CbeOrganization {
 
 	public void setAbbrev(String lang, String abbrev) {
 		this.abbrevs.put(lang, abbrev);
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getWebsite() {

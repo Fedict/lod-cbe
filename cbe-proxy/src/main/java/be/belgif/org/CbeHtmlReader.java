@@ -76,6 +76,9 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	@ConfigProperty(name = "be.belgif.org.html.org.general.abbrevs")
 	protected String GENERAL_ABBREVS;
 
+	@ConfigProperty(name = "be.belgif.org.html.org.general.email")
+	protected String GENERAL_EMAIL;
+
 	@ConfigProperty(name = "be.belgif.org.html.org.general.website")
 	protected String GENERAL_WEBSITE;
 
@@ -123,6 +126,7 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 		
 		Element names = table.selectFirst(GENERAL_NAMES);
 		Element abbrevs = table.selectFirst(GENERAL_ABBREVS);
+		Element email = table.selectFirst(GENERAL_EMAIL);
 		Element website = table.selectFirst(GENERAL_WEBSITE);
 
 		if (siteId == null) {
@@ -159,6 +163,10 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 			}
 		}
 
+		if (email != null) {
+			org.setEmail(email.attr("href").trim());
+		}
+	
 		if (website != null) {
 			org.setWebsite(website.attr("href").trim());
 		}

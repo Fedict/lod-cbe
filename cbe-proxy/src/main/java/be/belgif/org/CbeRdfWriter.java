@@ -132,6 +132,9 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		for (String act: org.getVatActivities()) {
 			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replaceAll("\\.", "")));
 		}
+		if (org.getEmail() != null) {
+			m.add(id, FOAF.MBOX, F.createIRI(org.getEmail()));
+		}
 		if (org.getWebsite() != null) {
 			m.add(id, FOAF.HOMEPAGE, F.createIRI(org.getWebsite()));
 		}
