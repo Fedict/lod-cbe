@@ -112,13 +112,13 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		IRI id;
 		if (parentId == null) {
 			id = F.createIRI(orgPrefix + orgId);
+			m.add(id, RDF.TYPE, ORG.ORGANIZATION);
+			m.add(id, RDF.TYPE, ROV.REGISTERED_ORGANIZATION);
 		} else {
 			id = F.createIRI(sitePrefix + orgId);
-			m.add(id, ORG.SUB_ORGANIZATION_OF, F.createIRI(orgPrefix + parentId.replaceAll("\\.", "_")));
+			m.add(id, RDF.TYPE, ORG.SITE);
+			m.add(id, ORG.SITE_OF, F.createIRI(orgPrefix + parentId.replaceAll("\\.", "_")));
 		}
-
-		m.add(id, RDF.TYPE, ORG.ORGANIZATION);
-		m.add(id, RDF.TYPE, ROV.REGISTERED_ORGANIZATION);
 
 		for (Entry<String, String> e: org.getNames().entrySet()) {
 			m.add(id, ROV.LEGAL_NAME, F.createLiteral(e.getValue(), e.getKey()));
