@@ -9,9 +9,9 @@
     <artifactId>cbe-converter</artifactId>
     <packaging>jar</packaging>
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <rdf4j.version>2.5.4</rdf4j.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <rdf4j.version>3.5.1</rdf4j.version>
     </properties>
     <name>cbe-converter</name>
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
             <artifactId>rdf4j-rio-api</artifactId>
-            <version>2.5.4</version>
+            <version>${rdf4j.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -31,7 +31,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.2.0</version>
                 <configuration>
                     <archive>
                         <manifest>
