@@ -1,9 +1,11 @@
-# HTML to RDF proxy
+# Experimental HTML to RDF proxy
 
 
 A simple reverse proxy for converting the output from the Belgian "Crossroad Bank Enterprises" company register into W3C ORG/ROV triples.
 
 See also https://kbopub.economie.fgov.be/kbopub/zoeknaamfonetischform.html
+
+Note: URIs are not official yet (= they may change in the near future)
 
 ![flow](flow.png)
 
