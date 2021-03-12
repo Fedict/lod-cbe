@@ -9,7 +9,7 @@
 	<properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-		<rdf4j.version>3.5.1</rdf4j.version>
+		<rdf4j.version>3.6.0</rdf4j.version>
     </properties>
     <artifactId>cbe-common</artifactId>
     <packaging>jar</packaging>
@@ -37,7 +37,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>4.6</version>
+            <version>5.3</version>
         </dependency>
     </dependencies>
     <groupId>be.fedict.lodtools</groupId>

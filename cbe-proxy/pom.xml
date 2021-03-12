@@ -12,9 +12,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
-		<quarkus.version>1.11.1.Final</quarkus.version>
+		<quarkus.version>1.12.2.Final</quarkus.version>
 		<surefire-plugin.version>2.22.1</surefire-plugin.version>
-		<rdf4j.version>3.5.1</rdf4j.version>
+		<rdf4j.version>3.6.0</rdf4j.version>
 	</properties>
 	<name>cbe-proxy</name>
 	<description>Converts CBE public search to linked data </description>
