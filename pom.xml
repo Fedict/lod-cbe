@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>be.fedict.lodtools</groupId>
-    <artifactId>cbe</artifactId>
-    <version>1.4</version>
+    <groupId>be.bosa.dt</groupId>
+    <artifactId>cbetools-parent</artifactId>
+    <version>1.5</version>
     <packaging>pom</packaging>
     <modules>
-        <module>converter</module>
-        <module>cbe-updater</module>
-        <module>cbe-common</module>
-        <module>cbe-proxy</module>
+        <module>cbetools-converter</module>
+        <module>cbetools-updater</module>
+        <module>cbetools-common</module>
+        <module>cbetools-proxy</module>
 	</modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <description>CBE tools</description>
+    <description>Belgian Crossroad Bank for Enterprises (CBE) tools</description>
+	<licenses>
+		<license>
+			<name>BSD-2-Clause</name>
+			<url>https://opensource.org/licenses/BSD-2-Clause</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<organization>
+		<name>FPS BOSA</name>
+		<url>https://bosa.belgium.be/</url>
+	</organization>
 </project>

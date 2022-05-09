@@ -7,3 +7,7 @@
 /cbe-common/target/
 /cbe-lod-proxy/target/
 /cbe-proxy/target/
+/cbetools-common/target/
+/cbetools-updater/target/
+/cbetools-converter/target/
+/cbetools-proxy/target/
