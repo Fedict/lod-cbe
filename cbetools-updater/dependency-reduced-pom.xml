@@ -26,7 +26,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.2.2</version>
         <configuration>
           <archive>
             <manifest>
@@ -38,7 +38,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.4.3</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -49,7 +49,7 @@
               <transformers>
                 <transformer>
                   <manifestEntries>
-                    <Main-Class>be.fedict.lodtools.cbe.updater.Main</Main-Class>
+                    <Main-Class>be.bosa.dt.cbetools.updater.Main</Main-Class>
                   </manifestEntries>
                 </transformer>
                 <transformer />
@@ -76,7 +76,5 @@
   <properties>
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.source>11</maven.compiler.source>
-    <rdf4j.version>3.5.1</rdf4j.version>
   </properties>
 </project>
-
