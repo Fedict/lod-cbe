@@ -106,7 +106,7 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 	private Model mapOrgToModel(CbeOrganization org) {
 		Model m = new LinkedHashModel();
 
-		String orgId = org.getId().replaceAll("\\.", "_");
+		String orgId = org.getId().replace(".", "");
 		String parentId = org.getParentId();
 	
 		IRI id;
@@ -117,7 +117,7 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		} else {
 			id = F.createIRI(sitePrefix + orgId);
 			m.add(id, RDF.TYPE, ORG.SITE);
-			m.add(id, ORG.SITE_OF, F.createIRI(orgPrefix + parentId.replaceAll("\\.", "_")));
+			m.add(id, ORG.SITE_OF, F.createIRI(orgPrefix + parentId.replace(".", "")));
 		}
 
 		for (Entry<String, String> e: org.getNames().entrySet()) {
@@ -127,10 +127,10 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 			m.add(id, SKOS.ALT_LABEL, F.createLiteral(e.getValue(), e.getKey()));
 		}		
 		for (String act: org.getNssActivities()) {
-			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replaceAll("\\.", "")));
+			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replace(".", "")));
 		}
 		for (String act: org.getVatActivities()) {
-			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replaceAll("\\.", "")));
+			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replace(".", "")));
 		}
 		if (org.getEmail() != null) {
 			m.add(id, FOAF.MBOX, F.createIRI(org.getEmail()));

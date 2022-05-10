@@ -65,15 +65,15 @@ public class CBEConverter {
 
 	private final static SimpleDateFormat SDF = new SimpleDateFormat("dd-MM-yyyy");
 
-	public final static String ORG_BELGIF = "http://org.belgif.be";
+	public final static String ORG_BELGIF = "https://org.belgif.be";
 	
 	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/auth/nace2008/";
 	private final static String DOM_PREF_TYPE = "http://vocab.belgif.be/auth/orgtype/";
 	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
 
-	private final static String PREFIX_ORG = "/id/cbe/org/";
+	private final static String PREFIX_ORG = "/id/CbeRegisteredEntity/";
 	private final static String PREFIX_REG = "/id/cbe/registration/";
-	private final static String PREFIX_SITE = "/id/cbe/site/";
+	private final static String PREFIX_SITE = "/id/CbeEstablishmentUnit/";
 	private final static String PREFIX_ADDR = "/id/cbe/addr/";
 
 	private final static String RAMON_NACE = "http://ec.europa.eu/eurostat/ramon/ontologies/nace.rdf#";
@@ -88,7 +88,7 @@ public class CBEConverter {
 	 * @return IRI
 	 */
 	public static IRI makeID(String cbe) {
-		return makeID(cbe.startsWith("0") ? PREFIX_ORG : PREFIX_SITE, cbe);
+		return makeID((cbe.startsWith("0") || cbe.startsWith("1")) ? PREFIX_ORG : PREFIX_SITE, cbe);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class CBEConverter {
 	public static IRI makeID(String type, String cbe) {
 		return F.createIRI(new StringBuilder(ORG_BELGIF)
 			.append(type)
-			.append(cbe.replaceAll("\\.", "_").replaceAll(" ", "%20"))
+			.append(cbe.replace(".", "").replace(" ", ""))
 			.toString());
 	}
 
@@ -139,7 +139,7 @@ public class CBEConverter {
 	 */
 	public static IRI makeOCID(String cbe) {
 		return F.createIRI(new StringBuilder(DOM_PREF_OC)
-			.append(cbe.replaceAll("\\.", "")).toString());
+			.append(cbe.replace(".", "")).toString());
 	}
 
 	/**
