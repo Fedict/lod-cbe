@@ -34,8 +34,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 /**
@@ -43,7 +43,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
  * 
  * @author Bart Hanssens <bart.hanssens@bosa.fgov.be>
  */
-@Path("/id/cbe")
+@Path("/id/")
 public class CbeResource {
 	@ConfigProperty(name = "be.belgif.org.redirect.org")
 	protected String REDIRECT_ORG;
@@ -55,29 +55,61 @@ public class CbeResource {
     @RestClient
 	CbePublicSearch pubSearch;
 
+	// Organization
 	@GET
-	@Path("/org/{id}")
+	@Path("/cbe/org/{id}")
+	@Deprecated(since = "1.5")
 	@Produces({"application/n-triples", "application/ld+json"})
-	public CbeOrganization org(@PathParam("id") String id) {
-		return pubSearch.getOrgById(id.replace("_", ""));
+	public Response oldOrg(@PathParam("id") String id) {
+		return Response.seeOther(URI.create("/id/CbeRegisteredEntity/" + id.replace("_", ""))).build();
 	}
 	@GET
-	@Path("/org/{id}")
+	@Path("/cbe/org/{id}")
 	@Produces("text/html")
-	public Response orgRedirect(@PathParam("id") String id) {
+	@Deprecated(since = "1.5")
+	public Response oldOrgRedirect(@PathParam("id") String id) {
 		return Response.seeOther(URI.create(REDIRECT_ORG + id.replace("_", ""))).build();
 	}
 	
 	@GET
-	@Path("/site/{id}")
+	@Path("/CbeRegisteredEntity/{id}")
 	@Produces({"application/n-triples", "application/ld+json"})
-	public CbeOrganization site(@PathParam("id") String id) {
-		return pubSearch.getSiteById(id.replace("_", ""));
+	public CbeOrganization org(@PathParam("id") String id) {
+		return pubSearch.getOrgById(id);
 	}
 	@GET
-	@Path("/site/{id}")
+	@Path("/CbeRegisteredEntity/{id}")
+	@Produces("text/html")
+	public Response orgRedirect(@PathParam("id") String id) {
+		return Response.seeOther(URI.create(REDIRECT_ORG + id)).build();
+	}
+
+	// Buildings / establishments
+	@GET
+	@Path("/cbe/site/{id}")
+	@Produces({"application/n-triples", "application/ld+json"})
+	@Deprecated(since = "1.5")
+	public Response oldSite(@PathParam("id") String id) {
+		return Response.seeOther(URI.create("/id/CbeEstablishmentUnit/" + id.replace("_", ""))).build();
+	}
+	@GET
+	@Path("/cbe/site/{id}")
+	@Produces("text/html")
+	@Deprecated(since = "1.5")
+	public Response oldSiteRedirect(@PathParam("id") String id) {
+		return Response.seeOther(URI.create(REDIRECT_SITE + id.replace("_", ""))).build();
+	}
+	
+	@GET
+	@Path("/CbeEstablishmentUnit/{id}")
+	@Produces({"application/n-triples", "application/ld+json"})
+	public CbeOrganization site(@PathParam("id") String id) {
+		return pubSearch.getSiteById(id);
+	}
+	@GET
+	@Path("/CbeEstablishmentUnit/{id}")
 	@Produces("text/html")
 	public Response siteRedirect(@PathParam("id") String id) {
-		return Response.seeOther(URI.create(REDIRECT_SITE + id.replace("_", ""))).build();
+		return Response.seeOther(URI.create(REDIRECT_SITE)).build();
 	}
 }
