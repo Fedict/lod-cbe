@@ -26,20 +26,25 @@
 package be.belgif.org;
 
 import be.belgif.org.dao.CbeOrganization;
+
 import java.net.URI;
+import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 /**
- * Proxy endpoint
+ * Proxy endpoint, either redirects to HTML page or generates RDF (based on HTTP Accept Header)
  * 
  * @author Bart Hanssens <bart.hanssens@bosa.fgov.be>
  */
@@ -55,32 +60,52 @@ public class CbeResource {
     @RestClient
 	CbePublicSearch pubSearch;
 
+	// 9 to 12 numbers, starting with 0, 1 or 2
+	private final static Pattern ALL_NUMBER = Pattern.compile("[0-2]\\d{8,11}");
+	
+	/**
+	 * Check if an input parameter could be a valid CBE id
+	 * 
+	 * @param id 
+	 */
+	private void verifyId(String id) {
+		if (id == null || !ALL_NUMBER.matcher(id).matches()) {
+			throw new WebApplicationException("Invalid CBE ID", Status.BAD_REQUEST);
+		}
+	}
+
 	// Organization
 	@GET
 	@Path("/cbe/org/{id}")
 	@Deprecated(since = "1.5")
 	@Produces({"application/n-triples", "application/ld+json"})
 	public Response oldOrg(@PathParam("id") String id) {
-		return Response.seeOther(URI.create("/id/CbeRegisteredEntity/" + id.replace("_", ""))).build();
+		id = id.replace("_", "");
+		verifyId(id);
+		return Response.seeOther(URI.create("/id/CbeRegisteredEntity/" + id)).build();
 	}
 	@GET
 	@Path("/cbe/org/{id}")
 	@Produces("text/html")
 	@Deprecated(since = "1.5")
 	public Response oldOrgRedirect(@PathParam("id") String id) {
-		return Response.seeOther(URI.create(REDIRECT_ORG + id.replace("_", ""))).build();
+		id = id.replace("_", "");
+		verifyId(id);
+		return Response.seeOther(URI.create(REDIRECT_ORG + id)).build();
 	}
 	
 	@GET
 	@Path("/CbeRegisteredEntity/{id}")
 	@Produces({"application/n-triples", "application/ld+json"})
 	public CbeOrganization org(@PathParam("id") String id) {
+		verifyId(id);
 		return pubSearch.getOrgById(id);
 	}
 	@GET
 	@Path("/CbeRegisteredEntity/{id}")
 	@Produces("text/html")
 	public Response orgRedirect(@PathParam("id") String id) {
+		verifyId(id);
 		return Response.seeOther(URI.create(REDIRECT_ORG + id)).build();
 	}
 
@@ -90,26 +115,32 @@ public class CbeResource {
 	@Produces({"application/n-triples", "application/ld+json"})
 	@Deprecated(since = "1.5")
 	public Response oldSite(@PathParam("id") String id) {
-		return Response.seeOther(URI.create("/id/CbeEstablishmentUnit/" + id.replace("_", ""))).build();
+		id = id.replace("_", "");
+		verifyId(id);
+		return Response.seeOther(URI.create("/id/CbeEstablishmentUnit/" + id)).build();
 	}
 	@GET
 	@Path("/cbe/site/{id}")
 	@Produces("text/html")
 	@Deprecated(since = "1.5")
 	public Response oldSiteRedirect(@PathParam("id") String id) {
-		return Response.seeOther(URI.create(REDIRECT_SITE + id.replace("_", ""))).build();
+		id = id.replace("_", "");
+		verifyId(id);
+		return Response.seeOther(URI.create(REDIRECT_SITE + id)).build();
 	}
 	
 	@GET
 	@Path("/CbeEstablishmentUnit/{id}")
 	@Produces({"application/n-triples", "application/ld+json"})
 	public CbeOrganization site(@PathParam("id") String id) {
+		verifyId(id);
 		return pubSearch.getSiteById(id);
 	}
 	@GET
 	@Path("/CbeEstablishmentUnit/{id}")
 	@Produces("text/html")
 	public Response siteRedirect(@PathParam("id") String id) {
-		return Response.seeOther(URI.create(REDIRECT_SITE)).build();
+		verifyId(id);
+		return Response.seeOther(URI.create(REDIRECT_SITE + id)).build();
 	}
 }
