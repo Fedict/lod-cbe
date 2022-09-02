@@ -3,13 +3,13 @@
   <parent>
     <artifactId>cbetools-parent</artifactId>
     <groupId>be.bosa.dt</groupId>
-    <version>1.5</version>
+    <version>1.5.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.bosa.dt</groupId>
   <artifactId>cbetools-converter</artifactId>
   <name>cbetools-converter</name>
-  <version>1.5</version>
+  <version>1.5.0</version>
   <description>Converts full CBE open data download to Linked Open Data</description>
   <licenses>
     <license>
