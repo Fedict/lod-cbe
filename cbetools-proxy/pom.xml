@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>be.bosa.dt</groupId>
 		<artifactId>cbetools-parent</artifactId>
-		<version>1.5.0</version>
+		<version>1.5.1</version>
 	</parent>
 	<groupId>be.bosa.dt</groupId>
 	<artifactId>cbetools-proxy</artifactId>
@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
-		<quarkus.version>2.12.0.Final</quarkus.version>
+		<quarkus.version>2.15.2.Final</quarkus.version>
 	</properties>
 	<name>cbetools-proxy</name>
 	<description>Converts CBE public search HTML pages into RDF linked data</description>

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.bosa.dt</groupId>
     <artifactId>cbetools-parent</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
     <packaging>pom</packaging>
     <modules>
         <module>cbetools-converter</module>
@@ -13,7 +13,7 @@
 	</modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<rdf4j.version>4.1.1</rdf4j.version>
+		<rdf4j.version>4.2.2</rdf4j.version>
     </properties>
     <description>Belgian Crossroad Bank for Enterprises (CBE) tools</description>
 	<licenses>
