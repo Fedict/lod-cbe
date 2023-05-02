@@ -4,11 +4,11 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>cbetools-parent</artifactId>
-        <version>1.5.1</version>
+        <version>1.5.2</version>
     </parent>
     <groupId>be.bosa.dt</groupId>
 	<artifactId>cbetools-converter</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
     <description>Converts full CBE open data download to Linked Open Data</description>
     <packaging>jar</packaging>
     <properties>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cbetools-common</artifactId>
-            <version>1.5.1</version>
+            <version>1.5.2</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
