@@ -274,7 +274,7 @@ public class CBEConverter {
 		int i = 0;
 		
 		try {
-			i = Integer.valueOf(code);
+			i = Integer.parseInt(code);
 		} catch (NumberFormatException ioe) {
 			LOG.warn("Could not convert zip code {}", code);
 		}
@@ -297,18 +297,10 @@ public class CBEConverter {
 		IRI subj = makeID(row[0]);
 		String lang = "";
 		switch (row[1]) {
-			case "1":
-				lang = "fr";
-				break;
-			case "2":
-				lang = "nl";
-				break;
-			case "3":
-				lang = "de";
-				break;
-			case "4":
-				lang = "en";
-				break;
+			case "1" -> lang = "fr";
+			case "2" -> lang = "nl";
+			case "3" -> lang = "de";
+			case "4" -> lang = "en";
 		}
 		IRI pred = row[2].equals("001") ? ROV.LEGAL_NAME : SKOS.ALT_LABEL;
 		Literal lit = (!lang.isEmpty()) ? F.createLiteral(row[3], lang)
@@ -417,18 +409,18 @@ public class CBEConverter {
 		IRI contact = null;
 
 		switch (row[2]) {
-			case "TEL":
+			case "TEL" -> {
 				type = FOAF.PHONE;
 				contact = asPhone(row[3]);
-				break;
-			case "WEB":
+			}
+			case "WEB" -> {
 				type = FOAF.HOMEPAGE;
 				contact = asPage(row[3]);
-				break;
-			case "EMAIL":
+			}
+			case "EMAIL" -> {
 				type = FOAF.MBOX;
 				contact = asMail(row[3]);
-				break;
+			}
 		}
 		if (contact == null) {
 			return Stream.empty();

@@ -26,19 +26,16 @@
 package be.belgif.org;
 
 import be.belgif.org.dao.CbeOrganization;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.regex.Pattern;
-import javax.inject.Inject;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -69,8 +66,11 @@ public class CbeResource {
 	 * @param id 
 	 */
 	private void verifyId(String id) {
-		if (id == null || !ALL_NUMBER.matcher(id).matches()) {
-			throw new WebApplicationException("Invalid CBE ID", Status.BAD_REQUEST);
+		if (id == null || id.isEmpty()) {
+			throw new BadRequestException("CBE ID is null or empty");
+		}
+		if (!ALL_NUMBER.matcher(id).matches()) {
+			throw new BadRequestException("Invalid CBE ID " + id);
 		}
 	}
 

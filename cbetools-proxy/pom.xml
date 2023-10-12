@@ -4,16 +4,16 @@
 	<parent>
 		<groupId>be.bosa.dt</groupId>
 		<artifactId>cbetools-parent</artifactId>
-		<version>1.5.2</version>
+		<version>1.5.3</version>
 	</parent>
 	<groupId>be.bosa.dt</groupId>
 	<artifactId>cbetools-proxy</artifactId>
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
-		<quarkus.version>2.16.6.Final</quarkus.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+		<quarkus.version>3.4.2</quarkus.version>
 	</properties>
 	<name>cbetools-proxy</name>
 	<description>Converts CBE public search HTML pages into RDF linked data</description>
@@ -76,14 +76,14 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.15.4</version>
+			<version>1.16.1</version>
 		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.2</version>
 				<configuration>
 					<systemProperties>
 						<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>

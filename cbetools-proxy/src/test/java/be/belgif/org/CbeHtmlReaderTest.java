@@ -28,13 +28,14 @@ package be.belgif.org;
 import be.belgif.org.dao.CbeOrganization;
 
 import io.quarkus.test.junit.QuarkusTest;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

@@ -3,13 +3,13 @@
   <parent>
     <artifactId>cbetools-parent</artifactId>
     <groupId>be.bosa.dt</groupId>
-    <version>1.5.0</version>
+    <version>1.5.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>be.bosa.dt</groupId>
   <artifactId>cbetools-updater</artifactId>
   <name>cbetools-updater</name>
-  <version>1.5.0</version>
+  <version>1.5.3</version>
   <description>Converts incremental CBE update open data download to Linked Open Data</description>
   <licenses>
     <license>
@@ -26,7 +26,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.3.0</version>
         <configuration>
           <archive>
             <manifest>
@@ -38,7 +38,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.5.1</version>
         <executions>
           <execution>
             <phase>package</phase>
