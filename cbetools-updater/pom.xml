@@ -4,29 +4,29 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>cbetools-parent</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.4</version>
     </parent>
-	<groupId>be.bosa.dt</groupId>
+    <groupId>be.bosa.dt</groupId>
     <artifactId>cbetools-updater</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
     <packaging>jar</packaging>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <name>cbetools-updater</name>
-	<description>Converts incremental CBE update open data download to Linked Open Data</description>
-	<licenses>
-		<license>
-			<name>BSD-2-Clause</name>
-			<url>https://opensource.org/licenses/BSD-2-Clause</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<organization>
-		<name>FPS BOSA</name>
-		<url>https://bosa.belgium.be/</url>
-	</organization>
+    <description>Converts incremental CBE update open data download to Linked Open Data</description>
+    <licenses>
+        <license>
+            <name>BSD-2-Clause</name>
+            <url>https://opensource.org/licenses/BSD-2-Clause</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>FPS BOSA</name>
+        <url>https://bosa.belgium.be/</url>
+    </organization>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cbetools-common</artifactId>
-            <version>1.5.3</version>
+            <version>1.5.4</version>
         </dependency>
     </dependencies>
     <build>
@@ -54,7 +54,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-				<version>3.3.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.6.0</version>
                 <configuration>
                     <createDependencyReducedPom>true</createDependencyReducedPom>
                     <filters>
