@@ -35,7 +35,7 @@ USER nonroot
 
 WORKDIR /home/nonroot
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD ["java", "-jar", "/home/nonroot/cbetools-proxy.jar" ]
 
 EXPOSE 8080
