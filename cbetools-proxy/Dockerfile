@@ -3,7 +3,7 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4 AS temp
 RUN curl -L -o /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64 && \
   chmod +x /usr/local/bin/dumb-init
 
-FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:1.17-1.1696520331
+FROM registry.access.redhat.com/ubi8/openjdk-17-runtime:1.20-3
 
 LABEL org.opencontainers.image.authors="Bart Hanssens <bart.hanssens@bosa.fgov.be>" \
   io.k8s.display-name="CBE LOD Proxy" \

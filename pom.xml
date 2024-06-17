@@ -3,28 +3,28 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>be.bosa.dt</groupId>
     <artifactId>cbetools-parent</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
     <packaging>pom</packaging>
     <modules>
         <module>cbetools-converter</module>
         <module>cbetools-updater</module>
         <module>cbetools-common</module>
         <module>cbetools-proxy</module>
-	</modules>
+    </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<rdf4j.version>4.3.7</rdf4j.version>
+        <rdf4j.version>4.3.12</rdf4j.version>
     </properties>
     <description>Belgian Crossroad Bank for Enterprises (CBE) tools</description>
-	<licenses>
-		<license>
-			<name>BSD-2-Clause</name>
-			<url>https://opensource.org/licenses/BSD-2-Clause</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<organization>
-		<name>FPS BOSA</name>
-		<url>https://bosa.belgium.be/</url>
-	</organization>
+    <licenses>
+        <license>
+            <name>BSD-2-Clause</name>
+            <url>https://opensource.org/licenses/BSD-2-Clause</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>FPS BOSA</name>
+        <url>https://bosa.belgium.be/</url>
+    </organization>
 </project>

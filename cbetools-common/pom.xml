@@ -4,27 +4,27 @@
     <parent>
         <groupId>be.bosa.dt</groupId>
         <artifactId>cbetools-parent</artifactId>
-        <version>1.5.3</version>
+        <version>1.5.4</version>
     </parent>
     <groupId>be.bosa.dt</groupId>
     <artifactId>cbetools-common</artifactId>
-	<version>1.5.3</version>
+    <version>1.5.4</version>
     <packaging>jar</packaging>
-	<properties>
+    <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
-	<licenses>
-		<license>
-			<name>BSD-2-Clause</name>
-			<url>https://opensource.org/licenses/BSD-2-Clause</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-	<organization>
-		<name>FPS BOSA</name>
-		<url>https://bosa.belgium.be/</url>
-	</organization>
+    <licenses>
+        <license>
+            <name>BSD-2-Clause</name>
+            <url>https://opensource.org/licenses/BSD-2-Clause</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <organization>
+        <name>FPS BOSA</name>
+        <url>https://bosa.belgium.be/</url>
+    </organization>
     <dependencies>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
@@ -34,12 +34,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-			<version>1.7.36</version>
+            <version>1.7.36</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-			<version>1.7.36</version>
+            <version>1.7.36</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.rdf4j</groupId>
