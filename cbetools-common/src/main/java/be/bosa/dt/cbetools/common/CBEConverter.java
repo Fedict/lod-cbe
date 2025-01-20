@@ -68,6 +68,7 @@ public class CBEConverter {
 	public final static String ORG_BELGIF = "https://org.belgif.be";
 	
 	private final static String DOM_PREF_NACE8 = "http://vocab.belgif.be/auth/nace2008/";
+	private final static String DOM_PREF_NACE25 = "http://vocab.belgif.be/auth/nace2025/";
 	private final static String DOM_PREF_TYPE = "http://vocab.belgif.be/auth/orgtype/";
 	private final static String DOM_PREF_OC = "https://opencorporates.com/id/companies/be/";
 
@@ -76,11 +77,6 @@ public class CBEConverter {
 	private final static String PREFIX_SITE = "/id/CbeEstablishmentUnit/";
 	private final static String PREFIX_ADDR = "/id/cbe/addr/";
 
-	private final static String RAMON_NACE = "http://ec.europa.eu/eurostat/ramon/ontologies/nace.rdf#";
-	private final static String RAMON_DATA = "http://ec.europa.eu/eurostat/ramon/rdfdata/nace_r2/";
-	private final static IRI NACE_ACT = F.createIRI(RAMON_NACE + "Activity");
-	private final static IRI NACE_CODE = F.createIRI(RAMON_NACE + "code");
-	
 	/**
 	 * Make unique ID for an organization or site
 	 *
@@ -374,7 +370,9 @@ public class CBEConverter {
 				}
 				break;
 			case "Nace2008":
-				subj = F.createIRI(DOM_PREF_NACE8 + row[1]);
+			case "Nace2025":
+				String nace = row[0].equals("Nace2008") ? DOM_PREF_NACE8 : DOM_PREF_NACE25;
+				subj = F.createIRI(nace + row[1]);
 
 				s.add(F.createStatement(subj, SKOS.PREF_LABEL, label));
 
@@ -384,16 +382,8 @@ public class CBEConverter {
 				
 					String broader = broaderNace(row[2]);
 					if (broader != null) {
-						s.add(F.createStatement(subj, SKOS.BROADER, F.createIRI(DOM_PREF_NACE8 + broader)));
+						s.add(F.createStatement(subj, SKOS.BROADER, F.createIRI(nace + broader)));
 					}
-					int len = row[1].length();
-					IRI pred = (len < 5) ? SKOS.EXACT_MATCH : SKOS.BROAD_MATCH;
-					String ramon = row[1].substring(0, Math.min(len, 2));
-					if (len > 2) {
-						ramon += "." + row[1].substring(2, Math.min(len, 4));
-					}
-					IRI nace = F.createIRI(RAMON_DATA + ramon);
-					s.add(F.createStatement(subj, pred, nace));
 				}
 				break;
 		}
