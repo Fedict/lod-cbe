@@ -97,6 +97,9 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 	@ConfigProperty(name = "be.belgif.org.html.org.nsso.activity")
 	protected String NSSO_ACTIVITY;
 
+	@ConfigProperty(name = "be.belgif.org.html.org.nsso.activity_old")
+	protected String NSSO_OLD_ACTIVITY;
+
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
 		return genericType.equals(CbeOrganization.class);
@@ -178,6 +181,10 @@ public class CbeHtmlReader implements MessageBodyReader<CbeOrganization> {
 		Elements nssActivities = table.select(NSSO_ACTIVITY);
 		for (Element act: nssActivities) {
 			org.setNssActivity(act.text());
+		}
+		Elements nssOldActivities = table.select(NSSO_OLD_ACTIVITY);
+		for (Element act: nssOldActivities) {
+			org.setNssOldActivity(act.text());
 		}
 	
 		return org;

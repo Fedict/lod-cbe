@@ -73,6 +73,9 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 	@ConfigProperty(name = "be.belgif.org.prefix.nace")
 	protected String nacePrefix;
 
+	@ConfigProperty(name = "be.belgif.org.prefix.nace_old")
+	protected String naceOldPrefix;
+
 	private final ValueFactory F = SimpleValueFactory.getInstance();
 
 	@Override
@@ -125,11 +128,14 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		}
 		for (Entry<String, String> e: org.getAbbrevs().entrySet()) {
 			m.add(id, SKOS.ALT_LABEL, F.createLiteral(e.getValue(), e.getKey()));
-		}		
-		for (String act: org.getNssActivities()) {
-			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replace(".", "")));
 		}
 		for (String act: org.getVatActivities()) {
+			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(naceOldPrefix + act.replace(".", "")));
+		}
+		for (String act: org.getNssOldActivities()) {
+			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(naceOldPrefix + act.replace(".", "")));
+		}
+		for (String act: org.getNssActivities()) {
 			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(nacePrefix + act.replace(".", "")));
 		}
 		if (org.getEmail() != null) {

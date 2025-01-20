@@ -43,6 +43,7 @@ public class CbeOrganization {
 	private String website;
 	private List<String> vatActivities = new ArrayList<>();
 	private List<String> nssActivities = new ArrayList<>();
+	private List<String> nssOldActivities = new ArrayList<>();
 
 	public String getId() {
 		return id;
@@ -122,5 +123,17 @@ public class CbeOrganization {
 
 	public void setNssActivity(String nssActivity) {
 		this.nssActivities.add(nssActivity);
+	}	
+
+	public void setNssOldActivities(List<String> nssOldActivities) {
+		this.nssOldActivities = nssOldActivities;
+	}
+	
+	public List<String> getNssOldActivities() {
+		return nssOldActivities;
+	}
+
+	public void setNssOldActivity(String nssOldActivity) {
+		this.nssOldActivities.add(nssOldActivity);
 	}	
 }
