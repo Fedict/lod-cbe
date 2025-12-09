@@ -54,7 +54,7 @@ public class CbeHtmlReaderTest {
     public void testReader() {
 		CbeOrganization org = null;
 		
-		try(InputStream in = this.getClass().getResourceAsStream("test.html")) {
+		try(InputStream in = this.getClass().getResourceAsStream("test-bosa.html")) {
 			org = reader.readFrom(CbeOrganization.class, CbeOrganization.class, new Annotation[0], MediaType.WILDCARD_TYPE,
 				new MultivaluedHashMap<>(), in);
 		} catch (IOException ex) {

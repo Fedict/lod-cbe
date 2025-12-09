@@ -43,6 +43,7 @@ import java.util.Map.Entry;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.ValueFactory;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
@@ -124,10 +125,14 @@ public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
 		}
 
 		for (Entry<String, String> e: org.getNames().entrySet()) {
-			m.add(id, ROV.LEGAL_NAME, F.createLiteral(e.getValue(), e.getKey()));
+			Literal name = e.getKey().isEmpty() ? F.createLiteral(e.getValue()) 
+												: F.createLiteral(e.getValue(), e.getKey());
+			m.add(id, ROV.LEGAL_NAME, name);
 		}
 		for (Entry<String, String> e: org.getAbbrevs().entrySet()) {
-			m.add(id, SKOS.ALT_LABEL, F.createLiteral(e.getValue(), e.getKey()));
+			Literal name = e.getKey().isEmpty() ? F.createLiteral(e.getValue()) 
+												: F.createLiteral(e.getValue(), e.getKey());
+			m.add(id, SKOS.ALT_LABEL, name);
 		}
 		for (String act: org.getVatActivities()) {
 			m.add(id, ROV.ORG_ACTIVITY, F.createIRI(naceOldPrefix + act.replace(".", "")));

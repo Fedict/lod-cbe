@@ -108,4 +108,11 @@ public class CbeResourceTest {
           .when().accept("application/ld+json").get("/id/cbe/site/2147812701")
           .then().statusCode(200);
     }
+	
+	@Test
+	public void testEndPointPharmacy() {
+        given()
+          .when().accept("application/ld+json").get("/id/CbeRegisteredEntity/0218024029")
+          .then().statusCode(200);		
+	}
 }
