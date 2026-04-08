@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, FPS BOSA
+ * Copyright (c) 2026, FPS BOSA
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,58 +23,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.belgif.org;
+package be.belgif.org.converter;
 
-import be.belgif.org.dao.CbeOrganization;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
 /**
- * HTTP client that will perform the search on the CBE website
- * 
- * @see <a "https://kbopub.economie.fgov.be/kbopub/zoeknummerform.html">CBE search</a>
- * @author Bart Hanssens <bart.hanssens@bosa.fgov.be>
+ *
+ * @author Bart.Hanssens
  */
-@Service
-public class CbePublicSearch {
-	@Value("${be.belgif.org.redirect.org}")
-	protected String orgUrl;
-
-	@Value("${be.belgif.org.redirect.site}")
-	protected String siteUrl;
-
-	@Autowired
-	RestClient restClient;
-	
-	/**
-	 * Get legal organization
-	 * 
-	 * @param id
-	 * @return 
-	 */
-	public CbeOrganization getOrgById(String id) {
-		return restClient.get()
-						.uri(orgUrl + id)
-						.accept(MediaType.TEXT_HTML)
-						.retrieve()
-						.requiredBody(CbeOrganization.class);
-	}
-
-	/**
-	 * Get site / physical location
-	 * 
-	 * @param id
-	 * @return 
-	 */
-	public CbeOrganization getSiteById(String id) {
-		return restClient.get()
-				.uri(siteUrl + id)
-				.accept(MediaType.TEXT_HTML)
-				.retrieve()
-				.requiredBody(CbeOrganization.class);
+@Configuration
+public class CbeConverterConfig {
+	@Bean
+	RestClient restClient(RestClient.Builder builder) {
+		return builder.build();
 	}
 }

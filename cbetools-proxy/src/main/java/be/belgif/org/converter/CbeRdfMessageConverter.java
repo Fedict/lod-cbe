@@ -23,24 +23,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package be.belgif.org;
+package be.belgif.org.converter;
 
 import be.belgif.org.dao.CbeOrganization;
-
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.ext.MessageBodyWriter;
-import jakarta.ws.rs.ext.Provider;
-
 import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Map.Entry;
-
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
@@ -56,49 +44,66 @@ import org.eclipse.rdf4j.model.vocabulary.SKOS;
 import org.eclipse.rdf4j.rio.RDFFormat;
 import org.eclipse.rdf4j.rio.Rio;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpInputMessage;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
+import org.springframework.stereotype.Component;
+
 /**
  * Converts Java object into ORG/ROV triples
  * 
  * Bart Hanssens <bart.hanssens@bosa.fgov.be>
  */
-@Provider
-@Produces({"application/n-triples", "application/ld+json"})
-public class CbeRdfWriter implements MessageBodyWriter<CbeOrganization> {
+@Component
+public class CbeRdfMessageConverter implements HttpMessageConverter<CbeOrganization> {
 
-	@ConfigProperty(name = "be.belgif.org.prefix.organization")
+	@Value("${be.belgif.org.prefix.organization}")
 	protected String orgPrefix;
 
-	@ConfigProperty(name = "be.belgif.org.prefix.site")
+	@Value("${be.belgif.org.prefix.site}")
 	protected String sitePrefix;
 
-	@ConfigProperty(name = "be.belgif.org.prefix.nace")
+	@Value("${be.belgif.org.prefix.nace}")
 	protected String nacePrefix;
 
-	@ConfigProperty(name = "be.belgif.org.prefix.nace_old")
+	@Value("${be.belgif.org.prefix.nace_old}")
 	protected String naceOldPrefix;
 
-	private final ValueFactory F = SimpleValueFactory.getInstance();
+	private static final ValueFactory F = SimpleValueFactory.getInstance();
 
 	@Override
-	public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-		return genericType.equals(CbeOrganization.class) && 
+	public boolean canRead(Class<?> clazz, MediaType mediaType) {
+		return false;
+	}
+
+	@Override
+	public boolean canWrite(Class<?> clazz, MediaType mediaType) {
+		return clazz.equals(CbeOrganization.class) && 
 			(	RDFFormat.NTRIPLES.hasMIMEType(mediaType.toString()) || 
-				RDFFormat.JSONLD.hasMIMEType(mediaType.toString())	
-			);
+				RDFFormat.JSONLD.hasMIMEType(mediaType.toString())	);
 	}
 
 	@Override
-	public long getSize(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, 
-						MediaType mediaType) {
-		return -1;
+	public List<MediaType> getSupportedMediaTypes() {
+		return List.of(MediaType.valueOf(RDFFormat.NTRIPLES.getDefaultMIMEType()),
+						MediaType.valueOf(RDFFormat.JSONLD.getDefaultMIMEType()));
 	}
 
 	@Override
-	public void writeTo(CbeOrganization t, Class<?> type, Type genericType, Annotation[] annotations, 
-			MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) 
-				throws IOException, WebApplicationException {
-		RDFFormat fmt = RDFFormat.NTRIPLES.hasMIMEType(mediaType.toString()) ? RDFFormat.NTRIPLES : RDFFormat.JSONLD;
-		Rio.write(mapOrgToModel(t), entityStream, fmt);
+	public CbeOrganization read(Class<? extends CbeOrganization> clazz, HttpInputMessage inputMessage) 
+			throws IOException, HttpMessageNotReadableException {
+		throw new UnsupportedOperationException("Not supported");
+	}
+
+	@Override
+	public void write(CbeOrganization t, MediaType contentType, HttpOutputMessage outputMessage) 
+			throws IOException, HttpMessageNotWritableException {
+		RDFFormat fmt = RDFFormat.NTRIPLES.hasMIMEType(contentType.toString()) ? RDFFormat.NTRIPLES : RDFFormat.JSONLD;
+		Rio.write(mapOrgToModel(t), outputMessage.getBody(), fmt);
 	}
 
 	/**

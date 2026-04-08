@@ -25,38 +25,36 @@
  */
 package be.belgif.org;
 
+import be.belgif.org.converter.CbeHtmlMessageConverter;
 import be.belgif.org.dao.CbeOrganization;
-
-import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.mock.http.client.MockClientHttpResponse;
+
 /**
  *
  * @author Bart.Hanssens
  */
-@QuarkusTest
+@SpringBootTest
 public class CbeHtmlReaderTest {
-	@Inject
-	CbeHtmlReader reader;
+	@Autowired
+	CbeHtmlMessageConverter reader;
 
 	@Test
     public void testReader() {
 		CbeOrganization org = null;
 		
 		try(InputStream in = this.getClass().getResourceAsStream("test-bosa.html")) {
-			org = reader.readFrom(CbeOrganization.class, CbeOrganization.class, new Annotation[0], MediaType.WILDCARD_TYPE,
-				new MultivaluedHashMap<>(), in);
+			org = reader.read(CbeOrganization.class, new MockClientHttpResponse(in, HttpStatus.OK));
 		} catch (IOException ex) {
 			fail(ex.getMessage());
 		}

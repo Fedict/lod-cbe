@@ -25,25 +25,31 @@
  */
 package be.belgif.org;
 
-import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
 /**
  *
  * @author Bart.Hanssens
  */
-@QuarkusTest
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class CbeResourceTest {
-	@Test
-    public void testEndpointOrgNTOld() {
-        given()
-          .when().accept("application/n-triples").get("/id/cbe/org/0671_516_647")
-          .then().statusCode(200);
+	@LocalServerPort
+	int port;
+	
+	@BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
     }
-
+	
 	@Test
     public void testEndpointOrgNTNew() {
         given()
@@ -77,17 +83,10 @@ public class CbeResourceTest {
 	@Test
     public void testEndpointOrgJson() {
         given()
-          .when().accept("application/ld+json").get("/id/cbe/org/0671_516_647")
+          .when().accept("application/ld+json").get("/id/CbeRegisteredEntity/0671516647")
           .then().statusCode(200);
     }
-	
-	@Test
-    public void testEndpointSiteNTOld() {
-        given()
-          .when().accept("application/n-triples").get("/id/cbe/site/2_147_812_701")
-          .then().statusCode(200);
-    }
-	
+
 	@Test
     public void testEndpointSiteNTNew() {
         given()
@@ -96,16 +95,9 @@ public class CbeResourceTest {
     }
 
 	@Test
-    public void testEndpointSiteJsonOld() {
-        given()
-          .when().accept("application/ld+json").get("/id/cbe/site/2_147_812_701")
-          .then().statusCode(200);
-    }
-
-	@Test
     public void testEndpointSiteJsonNew() {
         given()
-          .when().accept("application/ld+json").get("/id/cbe/site/2147812701")
+          .when().accept("application/ld+json").get("/id/CbeEstablishmentUnit/2147812701")
           .then().statusCode(200);
     }
 	
